@@ -50,7 +50,7 @@ separate our app js an make it testable.
 Generally speaking we want to have an application which looks like the
 following:
 
-``` html
+``` jsx
 <div>
   <Header />
   <Content />
@@ -61,7 +61,7 @@ First lets create a new file called `src/client.jsx`. This file will hold the
 logic to inject our application to the html, but it will only do that.
 We will start using ES6 and JSX syntax from now on.
 
-``` javascript
+``` jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './app.jsx';
@@ -74,7 +74,7 @@ _Note 2:_ The import is relative from our file in case of custom code.
 
 Let's rename our `app.js` to `app.jsx` and replace the content as follows:
 
-``` javascript
+``` jsx
 import React from 'react';
 
 const App = () => (
@@ -153,7 +153,7 @@ HTML elements. Also remove them from the application.
 
 Your code should like this after the changes:
 
-``` javascript
+``` jsx
 import React from 'react';
 
 export const Header = () => (
@@ -243,7 +243,7 @@ Create a `.babelrc` file with the following contents:
 
 Rewrite our test to the following:
 
-``` javascript
+``` jsx
 import React from 'react';
 import {shallow} from 'enzyme';
 
@@ -258,9 +258,9 @@ test('App contains Header and Content', () => {
 });
 ```
 
-Our test wont pass. Modify the `app.jsx` code, make it pass.
+Our test failed as just we expected. Modify the `app.jsx` code, make it pass.
 
-``` javascript
+``` jsx
 const App = () => (
   <div>
     <Header />

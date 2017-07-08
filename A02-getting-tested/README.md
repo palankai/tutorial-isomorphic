@@ -12,16 +12,19 @@ build a docker image, start it and install the necessary packages.
 
 Build the image from this folder:
 ``` shell
-docker build -t tutorial-frontend .
+# execute on the host
+docker build -t tutorial .
 ```
 
 Start the container from this folder:
 ``` shell
+# execute on the host
 docker run --rm -ti -v $PWD:/usr/src/frontend tutorial
 ```
 
 Install missing packages
 ``` shell
+# execute inside the container
 npm install
 ```
 
@@ -31,6 +34,7 @@ install the packages again._
 
 Finally build the application (inside the running container):
 ``` shell
+# execute inside the container
 npm run build
 ```
 
@@ -135,6 +139,7 @@ Since we don't have any test implemented yet, we have to manually rebuild
 and test our application visually. Luckily it isn't too challenging yet.
 
 ``` shell
+# execute inside the container
 npm run build
 ```
 
@@ -185,6 +190,7 @@ As Jest is purely form development, we will install it as development
 dependency.
 
 ``` shell
+# execute inside the container
 npm install --save-dev jest
 ```
 
@@ -214,6 +220,7 @@ test('adds 1 + 2 to equal 3', () => {
 If we execute the following command we should see a great success:
 
 ``` shell
+# execute inside the container
 npm run test
 ```
 
@@ -221,6 +228,7 @@ But being able to test our application we have to do a bit more. We have
 to install `babel-jest` plugin.
 
 ``` shell
+# execute inside the container
 npm i -D babel-jest enzyme react-test-renderer
 ```
 _(We've used an `npm` shortcut for `npm install --save-dev`)_
@@ -320,6 +328,7 @@ modules locally, independently from our container if we want to.
 Build our image, now with `docker-compose`
 
 ``` shell
+# execute on the host
 docker-compose build
 ```
 
@@ -327,12 +336,14 @@ Now we can start our composed new build
 (from now on we will use Docker Compose to work)
 
 ``` shell
+# execute on the host
 docker-compose run --rm tutorial
 ```
 
 Finally we can execute our tests (inside the container)
 
 ``` shell
+# execute inside the container
 npm run test
 ```
 
@@ -385,12 +396,13 @@ CMD ["ash"]
 ### Build our container again to check that works
 
 ``` shell
+# execute on the host
 docker-compose build
 ```
 
 ## Finally, check that we are sill able to build our website
 
-Inside the container:
 ``` shell
+# execute inside the container
 npm run build
 ```

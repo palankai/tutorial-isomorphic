@@ -18,7 +18,7 @@ We will use Docker and Docker Compose. You should have the most recent
 version installed. I did everything on MacOS (using Docker-Mac) but I
 believe everything should work just fine on Linux or Windows.
 
-## Tutorial part I
+## Tutorial part A
 
 ### 01 Getting started
 
@@ -32,7 +32,7 @@ believe everything should work just fine on Linux or Windows.
 
 ### 06 Getting styled
 
-## Tutorial part II
+## Tutorial part B
 
 ### 07 Getting well organised
 

@@ -24,12 +24,14 @@ CMD ["ash"]
 Then build the image
 
 ``` bash
+# execute on the host
 docker build -t tutorial .
 ```
 
 Start the container
 
 ``` bash
+# execute on the host
 docker run --rm -ti -v $PWD:/usr/src/frontend tutorial
 ```
 
@@ -38,6 +40,7 @@ Let's test the following commands just to understand which version of
 NodeJS we have.
 
 ``` bash
+# execute inside the container
 node --version
 v8.1.3
 npm --version
@@ -48,6 +51,7 @@ If you see a version which is older than those, please update your alpine:node
 image locally.
 
 ``` bash
+# execute on the host
 docker pull node:alpine
 ```
 
@@ -64,6 +68,7 @@ With the following command you can create the `package.json`. If you omit the
 `-y` flag `npm` will ask a few question about the project.
 
 ``` bash
+# execute inside the container
 npm init -y
 ```
 
@@ -77,6 +82,7 @@ First we are going to install ReactJS
 ### Install ReactJS
 
 ``` bash
+# execute inside the container
 npm install --save react react-dom
 ```
 
@@ -90,8 +96,8 @@ We need to install `babel` and its plugins to being able to convert
 our ReactJS javascript files to a much more web compatible ES5 code.
 
 ``` bash
+# execute inside the container
 npm i -P babel-core babel-loader babel-preset-es2015 babel-preset-react
-
 ```
 
 ### Install Webpack
@@ -100,6 +106,7 @@ Finally we install `webpack` which helps us to build our separated files
 to one big bundle.
 
 ``` bash
+# execute inside the container
 npm i -P webpack
 ```
 
@@ -113,6 +120,7 @@ all of the installed packages. Then enter to the container again, and execute
 the following command:
 
 ``` bash
+# execute inside the container
 npm i
 ```
 
@@ -257,6 +265,7 @@ Replace the part above to the part below:
 ### Let's see how does it look
 
 ``` bash
+# execute inside the container
 npm run build
 ```
 

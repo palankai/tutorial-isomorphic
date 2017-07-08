@@ -1,0 +1,12 @@
+version: "3"
+services:
+  tutorial-frontend:
+    container_name: present-tutorial-frontend
+    image: present-tutorial-frontend
+    build:
+      context: .
+    volumes:
+      - "./:/usr/src/frontend"
+      - "data:/usr/src/frontend/node_modules"
+volumes:
+  data:

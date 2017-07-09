@@ -1,7 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom'
 
 const Header = () => (
-  <h1>Hello World</h1>
+  <div>
+    <h1>Hello World</h1>
+    <ul>
+      <li><Link to="/">Home</Link></li>
+      <li><Link to="/about">About</Link></li>
+    </ul>
+  </div>
 );
 
 export default Header;

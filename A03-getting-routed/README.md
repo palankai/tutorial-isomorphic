@@ -279,3 +279,132 @@ We've created a new scene, however we can switch over.
 In the following section we will build the logic which is necessary
 to link and switch pages.
 
+## Install React Router
+
+``` shell
+# execute inside the container
+npm i -P react-router react-router-dom
+```
+
+## Write some test
+
+The following test could be a little confusing, so feel free to jump to
+the next section first and understand the test later. However I feel
+writing test first build more confidence as we modify the code.
+
+We are going to use MemoryRouter which helps to test different scenes.
+Modify extend our `app.test.js`.
+
+``` jsx
+import React from 'react';
+import { mount } from 'enzyme';
+import { MemoryRouter } from 'react-router-dom'
+
+import App from '../src/app.jsx';
+import IndexScene from '../src/scenes/Index';
+import AboutScene from '../src/scenes/About';
+
+test('App contains IndexScene', () => {
+  const app = mount(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
+
+  expect(app.find(IndexScene)).toHaveLength(1);
+});
+
+test('App contains AboutScene on /about', () => {
+  const app = mount(
+    <MemoryRouter initialEntries={[ '/about' ]}>
+      <App />
+    </MemoryRouter>
+  );
+
+  expect(app.find(AboutScene)).toHaveLength(1);
+});
+```
+
+As you can see we modified our way of rendering. Before we used shallow
+rendering which only render the top level components. However in this
+case we need to know what happens deeper in the virtual dom.
+
+We only want to test the application (since we haven't changed anything else):
+
+``` shell
+# execute inside the container
+npm run test -- tests/app.test.js
+```
+
+Now we have to make our test pass
+
+## Implement routing
+
+We only have to modify our `app.jsx` to make our test pass. See the following
+code which describe how the application should behave:
+
+``` jsx
+const App = () => (
+  <Switch>
+    <Route exact path="/" component={IndexScene}/>
+    <Route path="/about" component={AboutScene}/>
+  </Switch>
+);
+```
+
+## Links
+
+It looks promising so far, but we have create some link to be able to navigate
+between our scenes.
+
+Modify our `Header` component, put some link to there. We could use `<a>`
+tags however in the next chapter we are going to modify the way how we render
+the application, so we are better of letting React Router create our links.
+
+``` jsx
+import React from 'react';
+import { Link } from 'react-router-dom'
+
+const Header = () => (
+  <div>
+    <h1>Hello World</h1>
+    <ul>
+      <li><Link to="/">Home</Link></li>
+      <li><Link to="/about">About</Link></li>
+    </ul>
+  </div>
+);
+
+export default Header;
+```
+
+## Make the routing work
+
+Although all of our test pass and we can build the client bundle.
+But that doesn't work, it actually throws some nasty error.
+In our test we specified the top level router as MemoryRouter. We have
+to do some similar in our `client.jsx` as well. We could use the
+Memory router which would be good testing our application, but the moment
+we reload our page we will go back to the home page.
+Modify our `client.jsx` to use `<HashRouter>` and wrap our `<App>` with it.
+
+``` jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { HashRouter } from 'react-router-dom';
+
+import App from './app.jsx';
+
+const Client = () => (
+  <HashRouter>
+    <App />
+  </HashRouter>
+);
+
+ReactDOM.render(<Client/>, document.getElementById("app"));
+```
+
+All test pass and if we build our client bundle again, we see
+the expected behaviour.
+
+In the next chapter we make it rendered server side.

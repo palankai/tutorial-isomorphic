@@ -35,7 +35,7 @@ npm run build
 
 ``` shell
 # execution inside the container
-npm i -P express babel-cli
+npm i -P express babel-cli ejs
 ```
 
 Modify our package.json to start our server.
@@ -43,7 +43,7 @@ We have to use `babel-node` to be able to use ES6 syntax.
 Add the following line to the scripts section.
 
 ``` json
-"server": "babel-node src/server"
+"start": "babel-node src/server"
 ```
 
 Modify our `.babelrc` to ignore `node_modules/`
@@ -131,3 +131,5 @@ inside our `server.js`.
 ``` jsx
 
 ```
+
+npm install -D webpack-dev-middleware

@@ -44,7 +44,7 @@ will be bundled with webpack.
 
 We started building our application, however we need to make sure
 when we modify our code we won't change unintentionally the behaviour so
-[Test our application](A02-getting-tested)
+[Getting tested](A02-getting-tested)
 
 ### 03 Getting routed
 
@@ -58,7 +58,7 @@ how can we handle the URL changes.
 If you build a website using React that's very likely you need to handle
 different pages (different URLs). In this chapter I'm going to demonstrate
 how can we handle the URL changes.
-[Getting routed](A03-getting-routed)
+[Getting rendered](A04-getting-rendered)
 
 ### 05 Getting data
 

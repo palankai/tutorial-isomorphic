@@ -217,6 +217,9 @@ That syntax come with ReactJS, which combine the power of javascript the power
 of HTML (XHTML). You can create classes, components without using that syntax
 but it makes the whole process much easier.
 
+Then we render our component to the `#app`. `ReactDOM.render` first argument
+should be a React component. The `<App />` syntax is more or less equivalent
+with `new App()`.
 
 ### Let `webpack` knows how to build our page
 

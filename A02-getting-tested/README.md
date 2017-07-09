@@ -11,19 +11,19 @@ If you start (or restart your tutorial from this point) you have to
 build a docker image, start it and install the necessary packages.
 
 Build the image from this folder:
-``` shell
+```shell
 # execute on the host
-docker build -t tutorial .
+docker build -t tutorial-frontend frontend/
 ```
 
 Start the container from this folder:
-``` shell
+```shell
 # execute on the host
-docker run --rm -ti -v $PWD:/usr/src/frontend tutorial
+docker run --rm -ti -v $PWD/frontend:/usr/src/frontend tutorial-frontend
 ```
 
 Install missing packages
-``` shell
+```shell
 # execute inside the container
 npm install
 ```
@@ -33,7 +33,7 @@ folder if we mount folder from the host, but right now just please
 install the packages again._
 
 Finally build the application (inside the running container):
-``` shell
+```shell
 # execute inside the container
 npm run build
 ```
@@ -50,18 +50,19 @@ separate our app js an make it testable.
 Generally speaking we want to have an application which looks like the
 following:
 
-``` jsx
+```jsx
 <div>
   <Header />
   <Content />
 </div>
 ```
 
-First lets create a new file called `src/client.jsx`. This file will hold the
-logic to inject our application to the html, but it will only do that.
+First lets create a new file called `frontend/src/client.jsx`.
+This file will hold the logic to inject our application to the html,
+but it will only do that.
 We will start using ES6 and JSX syntax from now on.
 
-``` jsx
+```jsx
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './app.jsx';
@@ -72,9 +73,10 @@ ReactDOM.render(<App/>, document.getElementById("app"));
 _Note:_ We've renamed our `app.js` to `app.jsx` as well.
 _Note 2:_ The import is relative from our file in case of custom code.
 
-Let's rename our `app.js` to `app.jsx` and replace the content as follows:
+Let's rename our `frontend/src/app.js` to `frontend/src/app.jsx`
+and replace the content as follows:
 
-``` jsx
+```jsx
 import React from 'react';
 
 const App = () => (
@@ -87,27 +89,91 @@ const App = () => (
 export default App;
 ```
 
+### Explanation
+
+First of all, to be able to use React components you have to import
+React in your files. There could be omitted in some cases, though (I guess).
+
+You can define react components in many ways.
+It could be a function as well, like:
+
+```jsx
+import React from 'react';
+
+function App() {
+  // We have to use parenthesis for multi line statements.
+  return (
+    <div>
+      <h1>Hello World</h1>
+      <p>This is my first ReactJS page</p>
+    </div>
+  )
+}
+```
+
+Nothing wrong with that function it would work as well. In some cases
+we will use that form. In ES6 with the `=>` syntax you can create anonymous
+functions. `() => { return 1; }` is equal `function x() { return 1; }` except
+the later has a name. And you can assign that anonymous function to a variable
+or even to a constant. Let's rewrite that function that way:
+
+```jsx
+import React from 'react';
+
+const App = () =>  {
+  // We have to use parenthesis for multi line statements.
+  return (
+    <div>
+      <h1>Hello World</h1>
+      <p>This is my first ReactJS page</p>
+    </div>
+  )
+}
+```
+I personally think that looks better, but there is a room for
+for further improvement. As you can see we only return something.
+In this case you're allowed to omit the return statement and the curly bracket
+as well.
+
+``` jsx
+import React from 'react';
+
+const App = () =>  (
+  <div>
+    <h1>Hello World</h1>
+    <p>This is my first ReactJS page</p>
+  </div>
+)
+```
+
+I believe that looks nicer and more compact.
+
+In the last line we make our component available outside of the context of
+this file.
+
+### Modify build process
+
 Let's make sure we are sill be able to build our application. In order to do
-that we have to do some modification on our `webpack.config.js`. It has to
-recognise the `*.jsx` files and it should build the `client.jsx` instead of
-the `app.js`.
+that we have to do some modification on our `frontend/webpack.config.js`.
+It has to recognise the `*.jsx` files and it should build the
+`frontend/src/client.jsx` instead of the `app.js`.
 
-After the modification the `webpack.config.js` file should look like the
-following:
-
-``` javascript
+```javascript
 var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-    entry: './src/client.jsx',
+    // Replace the entry
+    entry: path.resolve(__dirname, 'src', 'client.jsx'),
     output: {
         path: path.resolve(__dirname, 'build'),
+        // Specify new output filename
         filename: 'client.bundle.js'
     },
     module: {
         loaders: [
             {
+                // New regular expression recognise both js and jsx
                 test: /\.jsx?$/,
                 loader: 'babel-loader',
                 query: {
@@ -123,13 +189,14 @@ module.exports = {
 };
 ```
 
-You might have noticed already, we have to modify our `index.html` as well.
+You might have noticed already, we have to modify our `frontend/index.html`
+as well.
 
-``` html
+```html
 <script src="build/app.bundle.js"></script>
 ```
 Please replace the line above to the line below.
-``` html
+```html
 <script src="build/client.bundle.js"></script>
 ```
 
@@ -138,7 +205,7 @@ Please replace the line above to the line below.
 Since we don't have any test implemented yet, we have to manually rebuild
 and test our application visually. Luckily it isn't too challenging yet.
 
-``` shell
+```shell
 # execute inside the container
 npm run build
 ```
@@ -153,7 +220,7 @@ HTML elements. Also remove them from the application.
 
 Your code should like this after the changes:
 
-``` jsx
+```jsx
 import React from 'react';
 
 export const Header = () => (
@@ -189,7 +256,7 @@ framework for ReactJS. Also some Jest plugin to make our test simpler.
 As Jest is purely form development, we will install it as development
 dependency.
 
-``` shell
+```shell
 # execute inside the container
 npm install --save-dev jest
 ```
@@ -197,17 +264,17 @@ npm install --save-dev jest
 We have to add extend further our `package.json` to be able to execute
 the tests.
 
-``` json
+```json
   "scripts": {
     "build": "webpack",
     "jest": "jest"
   },
 ```
 
-Finally write our first, sanity test. Create `application.test.js` with the
-following content:
+Finally write our first, sanity test.
+Create `frontend/application.test.js` with the following content:
 
-``` javascript
+```javascript
 function sum(a, b) {
   return a + b;
 }
@@ -219,7 +286,7 @@ test('adds 1 + 2 to equal 3', () => {
 
 If we execute the following command we should see a great success:
 
-``` shell
+```shell
 # execute inside the container
 npm run test
 ```
@@ -227,15 +294,15 @@ npm run test
 But being able to test our application we have to do a bit more. We have
 to install `babel-jest` plugin.
 
-``` shell
+```shell
 # execute inside the container
 npm i -D babel-jest enzyme react-test-renderer
 ```
 _(We've used an `npm` shortcut for `npm install --save-dev`)_
 
 
-Create a `.babelrc` file with the following contents:
-``` json
+Create a `frontend/.babelrc` file with the following contents:
+```json
 {
   "presets": ["es2015", "react"]
 }
@@ -243,7 +310,7 @@ Create a `.babelrc` file with the following contents:
 
 Rewrite our test to the following:
 
-``` jsx
+```jsx
 import React from 'react';
 import {shallow} from 'enzyme';
 
@@ -258,9 +325,10 @@ test('App contains Header and Content', () => {
 });
 ```
 
-Our test failed as just we expected. Modify the `app.jsx` code, make it pass.
+Our test failed as just we expected.
 
-``` jsx
+Modify the `frontend/src/app.jsx` code, make it pass.
+```jsx
 const App = () => (
   <div>
     <Header />
@@ -276,9 +344,10 @@ The test should pass now.
 Our test is very slow. Based on the documentation, that is a known issue.
 https://facebook.github.io/jest/docs/troubleshooting.html#tests-are-extremely-slow-on-docker-and-or-continuous-integration-ci-server
 
-So modify our `package.json` add the `--runInBand` option to our test runner.
+So modify our `frontend/package.json` add
+the `--runInBand` option to our test runner.
 
-``` json
+```json
 ...
 "scripts": {
     "build": "webpack",
@@ -303,7 +372,7 @@ installed packages so we don't have to mount from local folder.
 
 Create a `docker-compose.yml` file with the following content:
 
-``` yaml
+```yaml
 version: "3"
 services:
   tutorial-frontend:
@@ -312,7 +381,7 @@ services:
     build:
       context: .
     volumes:
-      - "./:/usr/src/frontend"
+      - "./frontend:/usr/src/frontend"
       - "data:/usr/src/frontend/node_modules"
 volumes:
   data:
@@ -327,7 +396,7 @@ modules locally, independently from our container if we want to.
 
 Build our image, now with `docker-compose`
 
-``` shell
+```shell
 # execute on the host
 docker-compose build
 ```
@@ -335,14 +404,14 @@ docker-compose build
 Now we can start our composed new build
 (from now on we will use Docker Compose to work)
 
-``` shell
+```shell
 # execute on the host
-docker-compose run --rm tutorial
+docker-compose run --rm tutorial-frontend
 ```
 
 Finally we can execute our tests (inside the container)
 
-``` shell
+```shell
 # execute inside the container
 npm run test
 ```
@@ -359,7 +428,7 @@ Modify our `package.json` to have a `jest` root property with
 `"cacheDirectory": "./node_modules/.cache/jest"`.
 Our `package.json` should look like this (partially):
 
-``` json
+```json
 ...
 "main": "index.js",
 "scripts": {
@@ -383,7 +452,7 @@ It prevents building a container with failing tests without extra effort.
 
 Add that instruction to our `Dockerfile`:
 
-``` dockerfile
+```dockerfile
 COPY . .
 
 RUN npm run test
@@ -395,14 +464,14 @@ CMD ["ash"]
 
 ### Build our container again to check that works
 
-``` shell
+```shell
 # execute on the host
 docker-compose build
 ```
 
 ## Finally, check that we are sill able to build our website
 
-``` shell
+```shell
 # execute inside the container
 npm run build
 ```

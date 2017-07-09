@@ -6,10 +6,18 @@ ReactJS is a Javascript framework
 ## Create, build and start our docker development environment
 
 To make sure everybody use the very similar environment we will use docker.
+We will use multiple containers later for the frontend, backend part and
+for our acceptance tests as well, so in please create first a folder
+called `frontend` which will hold our frontend application code.
 
-Create a file called `Dockerfile`.
+``` shell
+# execute on the host
+mkdir frontend
+```
 
-```Dockerfile
+Create a file called `frontend/Dockerfile`.
+
+``` Dockerfile
 FROM node:alpine
 
 RUN mkdir /var/www
@@ -18,21 +26,20 @@ RUN mkdir -p /usr/src/frontend
 WORKDIR /usr/src/frontend
 
 CMD ["ash"]
-
 ```
 
 Then build the image
 
 ``` bash
 # execute on the host
-docker build -t tutorial .
+docker build -t tutorial-frontend frontend/
 ```
 
 Start the container
 
 ``` bash
 # execute on the host
-docker run --rm -ti -v $PWD:/usr/src/frontend tutorial
+docker run --rm -ti -v $PWD/frontend:/usr/src/frontend tutorial-frontend
 ```
 
 At this point we have an up and running node environment.
@@ -42,13 +49,14 @@ NodeJS we have.
 ``` bash
 # execute inside the container
 node --version
-v8.1.3
+# output: v8.1.3
+
 npm --version
-5.0.3
+# output: 5.0.3
 ```
 
-If you see a version which is older than those, please update your alpine:node
-image locally.
+If you see a version which is older than those, please pull the
+latest `alpine:node` and build your `tutorial-frontend` image again.
 
 ``` bash
 # execute on the host
@@ -110,42 +118,38 @@ to one big bundle.
 npm i -P webpack
 ```
 
-Please open your `package.json` and see those installed dependencies are
-listed under dependencies folder.
+Please open your `frontend/package.json` and see
+those installed dependencies are listed under dependencies section.
 
-### Excercise
+### Exercise
 
-Please exit from docker and remove the `node_modules/` folder, which contains
-all of the installed packages. Then enter to the container again, and execute
-the following command:
+Please exit from docker and remove the `frontend/node_modules/` folder,
+which contains all of the installed packages.
+Then enter to the container again, and execute the following command:
 
 ``` bash
 # execute inside the container
 npm i
 ```
 
+As you can observer it installs all of the necessary packages.
+
 ### Extend our `Dockerfile`
 
 To make sure all of the packages are ready whenever we start our container,
-let's add one more line to our `Dockerfile`: `RUN npm install`.
-Your `Dockerfile` should look like this:
+let's add a few more lines to our `frontend/Dockerfile` right
+after the `WORKDIR` statement:
 
 ``` Dockerfile
-FROM node:alpine
-
-RUN mkdir /var/www
-RUN mkdir -p /usr/src/frontend
-
-WORKDIR /usr/src/frontend
-
 COPY package.json .
 
 RUN npm install
 
 COPY . .
-
-CMD ["ash"]
 ```
+
+Build your `tutorial-frontend` image again. It installs all of the
+necessary packages in build time.
 
 _Note: The local folder mount overrides the `node_modules/` folder inside
 the container. We will address this issue shortly._
@@ -162,7 +166,7 @@ application itself.
 are able to see no matter how awesome is our application. We will address
 that issue as well*
 
-Create a file `index.html` in the project root with the following content:
+Create a file `frontend/index.html` the following content:
 
 ``` html
 <!DOCTYPE html>
@@ -179,8 +183,8 @@ Create a file `index.html` in the project root with the following content:
 ```
 
 
-Create a folder `src` and a file called `src/app.js` with the following
-content:
+Create a folder `frontend/src` and a file called `frontend/src/app.js`
+with the following content:
 
 ``` javascript
 var React = require('react');
@@ -214,9 +218,9 @@ of HTML (XHTML). You can create classes, components without using that syntax
 but it makes the whole process much easier.
 
 
-### Let `webpack` know how to build our page
+### Let `webpack` knows how to build our page
 
-Create a file called `webpack.config.js` (in the project root folder)
+Create a file called `frontend/webpack.config.js`
 with the following content:
 
 ``` javascript
@@ -224,7 +228,7 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-    entry: './src/app.js',
+    entry: path.resolve(__dirname, './src/app.js'),
     output: {
         path: path.resolve(__dirname, 'build'),
         filename: 'app.bundle.js'
@@ -247,7 +251,7 @@ module.exports = {
 };
 ```
 
-### Modify our `package.json` to being able to build our bundles
+### Modify our `frontend/package.json` to being able to build our bundles
 
 ``` json
   "scripts": {
@@ -275,17 +279,4 @@ this command to being able to see the changes.
 
 ### Finally check our works
 
-Open the `index.html` file in your browser.
-
-## Quick recap what we have done
-
-So far we have created a NodeJS working environment. We installed the minimal
-necessary packages which we used to build our first ReactJS application.
-
-## References
-
-I've learned and used some of the materials from this amazing tutorial:
-http://ccoenraets.github.io/es6-tutorial-react/ I recommend to read those
-pages as well. You can find more material about babel, webpack and ES6 as well.
-
-
+Open the `frontend/index.html` file in your browser.

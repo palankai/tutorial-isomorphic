@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "version": "1.0.0",
-  "description": "In this tutorial we're going to build our first ReactJS site from scratch. To make sure everybody use the very similar environment we will use docker.",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "build": "webpack"

@@ -1,9 +1,30 @@
 # How to build a React + Redux Isomorphic website
 
+## What is this tutorial
+
+In this tutorial I'm going to explain step-by-step how can you build a complex
+React application from scratch. I'm not going to use any boilerplate because
+I want to show every steps which hopefully helps to understand what happens
+behind.
+There are many-many plugins which you could use, however I believe
+if you follow my footsteps you will understand the React world and will
+be able much more confidently use any 3rd party modules.
+
+### Why
+
+I'm a python backend developer, I don't usually build webpages nowadays,
+however, sometimes I have to build some admin interfaces to our
+backend services. I have some (very rusty) JavaScript knowledge so I
+started to read tutorials. I found some very good tutorials but I haven't
+find a complete tutorial which explains everything literally step-by-step.
+So I've decided I document my experiments in this new world.
+
 ## Prerequisite
 
 You should know how to use Docker (and Compose) and have minimal knowledge
 of HTML, CSS and Javascript.
+If you have any question, you find difficult to follow any of the steps or
+you think I should give more explanation please drop me a message.
 
 ### Technical prerequisite
 
@@ -15,19 +36,45 @@ believe everything should work just fine on Linux or Windows.
 
 ### 01 Getting started
 
+In our first tutorial we build a very simple React component which
+will be bundled with webpack.
+[Getting started](A01-getting-started)
+
 ### 02 Getting tested
 
-### 03 Getting rendered
+We started building our application, however we need to make sure
+when we modify our code we won't change unintentionally the behaviour so
+[Test our application](A02-getting-tested)
 
-### 04 Getting routed
+### 03 Getting routed
 
-### 05 Getting dynamic
+If you build a website using React that's very likely you need to handle
+different pages (different URLs). In this chapter I'm going to demonstrate
+how can we handle the URL changes.
+[Getting routed](A03-getting-routed)
+
+### 04 Getting rendered
+
+If you build a website using React that's very likely you need to handle
+different pages (different URLs). In this chapter I'm going to demonstrate
+how can we handle the URL changes.
+[Getting routed](A03-getting-routed)
+
+### 05 Getting data
+
+Receive and send some data to the server...
+TODO
 
 ### 06 Getting styled
 
-## Tutorial part B
+Using CSS (SCSS) we are going to make our application pretty...
+TODO
 
 ### 07 Getting well organised
+
+We are going to refactor our application code, using small tricks
+that make the development easier.
+TODO
 
 ## Disclaimer
 

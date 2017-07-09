@@ -148,6 +148,14 @@ RUN npm install
 COPY . .
 ```
 
+We want to avoid having unnecessary files inside our image, so just as
+`.gitignore` we can ignore files and folders for docker as well.
+Create a file called `frontend/.dockerignore`:
+
+```
+node_modules
+```
+
 Build your `tutorial-frontend` image again. It installs all of the
 necessary packages in build time.
 
@@ -177,13 +185,13 @@ Create a file `frontend/index.html` the following content:
   </head>
   <body>
     <div id="app"></div>
-    <script src="build/app.bundle.js"></script>
+    <script src="build/client.bundle.js"></script>
   </body>
 </html>
 ```
 
 
-Create a folder `frontend/src` and a file called `frontend/src/app.js`
+Create a folder `frontend/src` and a file called `frontend/src/client.js`
 with the following content:
 
 ``` javascript
@@ -231,10 +239,10 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-    entry: path.resolve(__dirname, './src/app.js'),
+    entry: path.resolve(__dirname, 'src', 'client.js'),
     output: {
         path: path.resolve(__dirname, 'build'),
-        filename: 'app.bundle.js'
+        filename: 'client.bundle.js'
     },
     module: {
         loaders: [

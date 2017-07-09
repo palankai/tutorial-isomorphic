@@ -38,10 +38,13 @@ Finally build the application (inside the running container):
 npm run build
 ```
 
+Open `frontend/index.html` in the browser.
+
+
 ## Restructure our code, make some room for test
 
 What we should test? I have to admit, I don't have a proper answer to that.
-In this tutorial I'm going to show how can we test ReactJS compoents and I
+In this tutorial I'm going to show how can we test ReactJS components and I
 let you decide what we should test.
 
 We are going to create separate our already awesome application.
@@ -57,24 +60,11 @@ following:
 </div>
 ```
 
-First lets create a new file called `frontend/src/client.jsx`.
-This file will hold the logic to inject our application to the html,
-but it will only do that.
-We will start using ES6 and JSX syntax from now on.
+We are going to create a new module and put our application logic there.
+Also we start using ES6/jsx syntax (explanation follows).
 
-```jsx
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './app.jsx';
-
-ReactDOM.render(<App/>, document.getElementById("app"));
-```
-
-_Note:_ We've renamed our `app.js` to `app.jsx` as well.
-_Note 2:_ The import is relative from our file in case of custom code.
-
-Let's rename our `frontend/src/app.js` to `frontend/src/app.jsx`
-and replace the content as follows:
+First let's create a new file called `frontend/src/app.jsx` with the following
+content:
 
 ```jsx
 import React from 'react';
@@ -88,6 +78,23 @@ const App = () => (
 
 export default App;
 ```
+
+Node does not differentiate files based on the extension but I prefer
+to use `jsx` if the code define  visual elements.
+
+And modify our `frontend/src/client.js`, remove the application logic,
+but keep the rendering logic there.
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './app.jsx';
+
+ReactDOM.render(<App/>, document.getElementById("app"));
+```
+
+_Note:_ The import is relative from our file in case of custom code.
+
 
 ### Explanation
 
@@ -153,51 +160,14 @@ this file.
 
 ### Modify build process
 
-Let's make sure we are sill be able to build our application. In order to do
-that we have to do some modification on our `frontend/webpack.config.js`.
-It has to recognise the `*.jsx` files and it should build the
-`frontend/src/client.jsx` instead of the `app.js`.
+Let's make sure we are sill be able to build our application.
+In order to do that we have to do some modification in
+our `frontend/webpack.config.js`.
 
-```javascript
-var path = require('path');
-var webpack = require('webpack');
+- it has to recognise the `*.jsx` files as well
 
-module.exports = {
-    // Replace the entry
-    entry: path.resolve(__dirname, 'src', 'client.jsx'),
-    output: {
-        path: path.resolve(__dirname, 'build'),
-        // Specify new output filename
-        filename: 'client.bundle.js'
-    },
-    module: {
-        loaders: [
-            {
-                // New regular expression recognise both js and jsx
-                test: /\.jsx?$/,
-                loader: 'babel-loader',
-                query: {
-                    presets: ['es2015', 'react']
-                }
-            }
-        ]
-    },
-    stats: {
-        colors: true
-    },
-    devtool: 'source-map'
-};
-```
-
-You might have noticed already, we have to modify our `frontend/index.html`
-as well.
-
-```html
-<script src="build/app.bundle.js"></script>
-```
-Please replace the line above to the line below.
-```html
-<script src="build/client.bundle.js"></script>
+``` javascript
+test: /\.jsx?$/,
 ```
 
 ### Manual test that we are still doing well
@@ -267,12 +237,14 @@ the tests.
 ```json
   "scripts": {
     "build": "webpack",
-    "jest": "jest"
+    "test": "jest"
   },
 ```
 
 Finally write our first, sanity test.
-Create `frontend/application.test.js` with the following content:
+Create a new folder for our tests: `frontend/tests/`.
+
+Create `frontend/tests/app.test.js` with the following content:
 
 ```javascript
 function sum(a, b) {
@@ -291,8 +263,10 @@ If we execute the following command we should see a great success:
 npm run test
 ```
 
+Our test is very slow. We will address this issue in the next section.
+
 But being able to test our application we have to do a bit more. We have
-to install `babel-jest` plugin.
+to install a few plugins.
 
 ```shell
 # execute inside the container
@@ -314,8 +288,8 @@ Rewrite our test to the following:
 import React from 'react';
 import {shallow} from 'enzyme';
 
-import App from './src/app.jsx';
-import { Header, Content } from './src/app.jsx';
+import App from '../src/app.jsx';
+import { Header, Content } from '../src/app.jsx';
 
 test('App contains Header and Content', () => {
   const app = shallow(<App />);
@@ -339,24 +313,7 @@ const App = () => (
 
 The test should pass now.
 
-### Speed up our test runner
-
-Our test is very slow. Based on the documentation, that is a known issue.
-https://facebook.github.io/jest/docs/troubleshooting.html#tests-are-extremely-slow-on-docker-and-or-continuous-integration-ci-server
-
-So modify our `frontend/package.json` add
-the `--runInBand` option to our test runner.
-
-```json
-...
-"scripts": {
-    "build": "webpack",
-    "test": "jest --runInBand"
-  },
-...
-```
-
-If you use `docker-mac` you will still experience significant slowness.
+## Switch to Docker Compose
 
 If we try to run our test without mounting the local folder (for that
 we have to rebuild the docker image) we will see how test should run.
@@ -368,18 +325,16 @@ workaround.
 We should use a data container for `node_modules/` which holds our
 installed packages so we don't have to mount from local folder.
 
-## Switch to Docker Compose
-
 Create a `docker-compose.yml` file with the following content:
 
 ```yaml
 version: "3"
 services:
   tutorial-frontend:
-    container_name: present-tutorial-frontend
-    image: present-tutorial-frontend
+    container_name: tutorial-frontend
+    image: tutorial-frontend
     build:
-      context: .
+      context: frontend/
     volumes:
       - "./frontend:/usr/src/frontend"
       - "data:/usr/src/frontend/node_modules"
@@ -424,40 +379,53 @@ unfortunate because we don't want to commit that either. (We've just achieved
 not having `node_modules/` locally). Tweak a bit our `package.json`, give Jest
 some instruction.
 
-Modify our `package.json` to have a `jest` root property with
+Modify our `package.json` to have a `jest` top level property with
 `"cacheDirectory": "./node_modules/.cache/jest"`.
 Our `package.json` should look like this (partially):
 
 ```json
 ...
-"main": "index.js",
-"scripts": {
-  "build": "webpack",
-  "test": "jest --runInBand"
-},
 "jest": {
   "cacheDirectory": "./node_modules/.cache/jest"
-},
-"keywords": [],
+}
 ...
 ```
 
 Now we can remove both `jest_0` and `node_modules` folder from our host
 working directory. (`node_modules` will be recreated, though)
 
+Try to build the image again, execute the tests, build the bundle and
+check whether everything is still good in the browser.
+
+### Speed up our test runner (optional)
+
+If our test is very slow. Based on the documentation, that is a known issue.
+https://facebook.github.io/jest/docs/troubleshooting.html#tests-are-extremely-slow-on-docker-and-or-continuous-integration-ci-server
+
+So modify our `frontend/package.json` add
+the `--runInBand` option to our test runner.
+
+```json
+...
+"scripts": {
+    "build": "webpack",
+    "test": "jest --runInBand"
+  },
+...
+```
+
+If you use `docker-mac` and you still experience significant slowness,
+apply that modification. (I haven't found any problem without is, so far)
+
 ## Execute tests in build time
 
 I like the idea of running tests when we actually build the image.
 It prevents building a container with failing tests without extra effort.
 
-Add that instruction to our `Dockerfile`:
+Add that instruction to our `Dockerfile` just before the `CMD` statement.
 
 ```dockerfile
-COPY . .
-
 RUN npm run test
-
-CMD ["ash"]
 ```
 
 (Only the test runner part is new)

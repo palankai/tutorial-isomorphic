@@ -1,1 +1,1 @@
-# 03 Getting rendered (on the server side)_
+# 03 Getting routed

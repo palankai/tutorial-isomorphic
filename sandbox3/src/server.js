@@ -33,8 +33,6 @@ if (isProduction) {
   webpackDevHelper.useWebpackMiddleware(app);
 }
 
-
-
 app.get('*', (request, response) => {
   console.log(request.url);
   const context={};

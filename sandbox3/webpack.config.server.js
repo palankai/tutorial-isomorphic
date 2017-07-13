@@ -3,7 +3,7 @@ var webpack = require('webpack');
 var client_config = require('./webpack.config.js');
 
 const BUILD_PATH = path.resolve(process.env.BUILD_PATH);
-const loaders = client_config.loaders;
+const rules = client_config.rules;
 const resolve = client_config.resolve;
 
 
@@ -18,7 +18,7 @@ const serverConfig = {
   },
   externals: /^[a-z\-0-9]+$/,
   module: {
-    loaders: loaders
+    rules: rules
   },
   resolve: resolve
 };

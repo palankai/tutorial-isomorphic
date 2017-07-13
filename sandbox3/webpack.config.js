@@ -1,26 +1,45 @@
+/* includes */
+var fs = require('fs');
 var path = require('path');
+
 var webpack = require('webpack');
 var ManifestPlugin = require('webpack-manifest-plugin');
 
+/* environment */
 var environment = process.env.NODE_ENV || 'development';
 var isProduction = environment == 'production';
-
 var BUILD_PATH = path.resolve(process.env.BUILD_PATH);
 
 var JS_FILENAME = '[name]-[chunkhash].bundle.js';
+const presets = JSON.parse(fs.readFileSync(path.resolve(__dirname, '.babelrc'), 'utf8'));
+
+var jsx_loaders = [{loader: 'babel-loader', options: {presets: presets}}];
+var client_entry = path.resolve(__dirname, 'src', 'client.js');
+var plugins = [
+    new ManifestPlugin({
+      fileName: '../manifest.json'
+    }),
+
+];
+
 if (!isProduction) {
   JS_FILENAME = '[name].bundle.js';
+  jsx_loaders.unshift({loader: 'react-hot-loader'});
+  client_entry = [
+    client_entry,
+    'webpack-hot-middleware/client',
+    'webpack/hot/dev-server'
+  ];
+  plugins.push(
+    new webpack.HotModuleReplacementPlugin()
+  );
 };
 
-
-const loaders = [
+const rules = [
   {
     test: /\.jsx?$/,
     exclude: /node_modules/,
-    loaders: [
-      'react-hot-loader',
-      'babel-loader?presets[]=react,presets[]=es2015',
-    ]
+    use: jsx_loaders
   }
 ];
 
@@ -30,10 +49,7 @@ const resolve = {
 
 const clientConfig = {
   entry: {
-    client: [
-      path.resolve(__dirname, 'src', 'client.js'),
-      'webpack-hot-middleware/client', 'webpack/hot/dev-server'
-    ]
+    client: client_entry
   },
   output: {
     path: path.resolve(BUILD_PATH, 'www'),
@@ -41,23 +57,18 @@ const clientConfig = {
     publicPath: '/'
   },
   module: {
-    loaders: loaders
+    rules: rules
   },
   stats: {
     colors: true
   },
   resolve: resolve,
   devtool: 'source-map',
-  plugins: [
-    new ManifestPlugin({
-      fileName: '../manifest.json'
-    }),
-    new webpack.HotModuleReplacementPlugin()
-  ]
+  plugins: plugins
 };
 
 module.exports = {
   default: clientConfig,
-  loaders: loaders,
+  rules: rules,
   resolve: resolve
 };

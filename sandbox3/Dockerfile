@@ -19,6 +19,8 @@ RUN npm run test
 
 RUN npm run build
 
-EXPOSE 8080
+RUN npm run build:server
+
+EXPOSE 8000
 
 CMD ["npm", "run", "start"]

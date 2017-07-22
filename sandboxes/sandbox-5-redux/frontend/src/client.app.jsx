@@ -3,6 +3,8 @@ import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { renderRoutes } from 'react-router-config';
 import { createStore, applyMiddleware } from 'redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
@@ -15,7 +17,7 @@ delete window.__PRELOADED_STATE__;
 const store = createStore(
   reducer,
   preloadedState,
-  applyMiddleware(thunk)
+  composeWithDevTools(applyMiddleware(thunk))
 );
 
 const ClientApp = () => (

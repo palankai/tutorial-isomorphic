@@ -1,7 +1,4 @@
-const initialState = {
-  content: 'Hello from Redux, SSO'
-};
-
+const initialState = {};
 
 export default function rootReducer(state=initialState, action) {
   switch(action.type) {

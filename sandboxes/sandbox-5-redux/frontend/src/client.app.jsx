@@ -10,6 +10,7 @@ import routes from './routes';
 import reducer from './reducers';
 
 const preloadedState = window.__PRELOADED_STATE__;
+delete window.__PRELOADED_STATE__;
 
 const store = createStore(
   reducer,

@@ -10,6 +10,8 @@ import { Provider } from 'react-redux';
 
 import routes from './routes';
 import { configureStore } from './store';
+import serialize from 'serialize-javascript';
+
 
 const BUILD_PATH = path.resolve(process.env.BUILD_PATH);
 const MANIFEST_PATH = path.resolve(BUILD_PATH, 'manifest.json');
@@ -91,7 +93,7 @@ app.get('*', (request, response) => {
 function renderHTML(html, clientFileName, state) {
   let script = '';
   if( state ) {
-    script += `<script>window.__PRELOADED_STATE__ = ${JSON.stringify(state)};</script>`;
+    script += `<script>window.__PRELOADED_STATE__ = ${serialize(state)};</script>`;
   }
   if( clientFileName ) {
     script += `<script src="${clientFileName}"></script>`;

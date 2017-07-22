@@ -1,5 +1,6 @@
 import IndexScene from './scenes/Index';
 import AboutScene from './scenes/About';
+import SubmitScene from './scenes/Submit';
 import Root from './components/Root';
 
 const routes = [
@@ -11,6 +12,9 @@ const routes = [
       },
       { path: '/about',
         component: AboutScene
+      },
+      { path: '/submit',
+        component: SubmitScene
       }
     ]
   }

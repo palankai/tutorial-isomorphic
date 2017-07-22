@@ -13,7 +13,7 @@ var BUILD_PATH = path.resolve(process.env.BUILD_PATH);
 var JS_FILENAME = '[name]-[chunkhash].bundle.js';
 const presets = JSON.parse(fs.readFileSync(path.resolve(__dirname, '.babelrc'), 'utf8'));
 
-var jsx_loaders = [{loader: 'babel-loader', options: {presets: presets}}];
+var jsx_loaders = [{loader: 'babel-loader', options: presets}];
 var client_entry = path.resolve(__dirname, 'src', 'client.js');
 var plugins = [
     new ManifestPlugin({

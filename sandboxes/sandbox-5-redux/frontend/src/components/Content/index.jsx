@@ -15,14 +15,14 @@ Content.propTypes = {
 };
 
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, ownProps) => {
   return {
     text: state.content
   };
 };
 
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch, ownProps) => {
   return {};
 };
 

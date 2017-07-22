@@ -1,5 +1,5 @@
 const initialState = {
-  content: 'Hello from Redux'
+  content: 'Hello from Redux, really ;)'
 };
 
 

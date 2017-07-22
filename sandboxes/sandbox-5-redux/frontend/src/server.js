@@ -5,9 +5,12 @@ import express from 'express';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router';
-import { renderRoutes } from 'react-router-config';
+import { matchRoutes, renderRoutes } from 'react-router-config';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux';
 
 import routes from './routes';
+import reducer from './reducers';
 
 const BUILD_PATH = path.resolve(process.env.BUILD_PATH);
 const MANIFEST_PATH = path.resolve(BUILD_PATH, 'manifest.json');
@@ -37,13 +40,18 @@ if (isProduction) {
 }
 
 app.get('*', (request, response) => {
+  const branch = matchRoutes(routes, request.url);
+  console.log(branch);
   console.log(request.url);
   const context={};
   let html = '';
+  const store = createStore(reducer);
   if( RENDER_SERVER || isProduction ) {
     html = renderToString(
       <StaticRouter location={request.url} context={context}>
-        {renderRoutes(routes)}
+        <Provider store={store}>
+          {renderRoutes(routes)}
+        </Provider>
       </StaticRouter>
     );
   }

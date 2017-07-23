@@ -5,6 +5,7 @@ import { withRouter } from 'react-router';
 import PropTypes from 'prop-types';
 import { fetchFromServer, unmount } from 'store/actions';
 import Header from 'components/Header';
+import { Button, Glyphicon } from 'react-bootstrap';
 
 class ComplexListScene extends React.Component {
 
@@ -41,7 +42,11 @@ class ComplexListScene extends React.Component {
               <li key={item.id}>#{item.id}: {item.content}</li>
             ))}
           </ul>
-          <button onClick={e => this.invalidate()}>Refresh</button>
+        <Button bsStyle="primary">
+          <Glyphicon glyph="star" />
+          Primary
+        </Button>
+          <button className="btn btn-default" onClick={e => this.invalidate()}>Refresh</button>
         </div>
     );
   }

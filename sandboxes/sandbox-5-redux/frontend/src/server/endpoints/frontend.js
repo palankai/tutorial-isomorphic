@@ -27,19 +27,24 @@ function preload(branch) {
   });
 }
 
-function renderHTML(html, scripts, state) {
+function renderHTML(html, scripts, styles, state) {
   let script = '';
+  let style = '';
   if( state ) {
     script += `<script>window.__PRELOADED_STATE__ = ${serialize(state)};</script>`;
   }
   scripts.map(filename => {
     script += `<script src="${filename}"></script>`;
   });
+  styles.map(filename => {
+    style += `<link rel="stylesheet" href="${filename}">`;
+  });
   return `<!DOCTYPE html>
     <html>
       <head>
         <title>Title of our awesome ReactJS page</title>
         <meta charset="utf-8" />
+        ${style}
       </head>
       <body>
         <div id="app">${html}</div>
@@ -65,8 +70,11 @@ function handler(request, response, config) {
       config.manifest['vendor.js'],
       config.manifest['client.js']
     ];
+    const styles = [
+      config.manifest['client.css']
+    ];
     response.send(renderHTML(
-      html, scripts, store.getState()
+      html, scripts, styles, store.getState()
     ));
   });
 };

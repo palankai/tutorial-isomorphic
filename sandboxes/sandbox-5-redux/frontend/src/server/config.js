@@ -6,7 +6,8 @@ function readManifest(manifestPath, isProduction) {
     return {
       'client.js': 'build/client.bundle.js',
       'manifest.js': 'build/manifest.bundle.js',
-      'vendor.js': 'build/vendor.bundle.js'
+      'vendor.js': 'build/vendor.bundle.js',
+      'client.css': 'build/client.bundle.css'
     };
   }
   return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));

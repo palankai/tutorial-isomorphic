@@ -4,6 +4,7 @@ var path = require('path');
 
 var webpack = require('webpack');
 var ManifestPlugin = require('webpack-manifest-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var commonConfig = require('./webpack.config.common.js');
 
@@ -13,7 +14,15 @@ var isProduction = environment == 'production';
 var BUILD_PATH = path.resolve(process.env.BUILD_PATH);
 
 var JS_FILENAME = '[name]-[chunkhash].bundle.js';
+var CSS_FILENAME = '[name]-[hash].bundle.min.css';
+var ASSET_FILENAME = 'assets/[name]-[hash].[ext]';
+
 const presets = JSON.parse(fs.readFileSync(path.resolve(__dirname, '.babelrc'), 'utf8'));
+if (!isProduction) {
+  JS_FILENAME = '[name].bundle.js';
+  CSS_FILENAME = '[name].bundle.css';
+  ASSET_FILENAME = 'assets/[name].[ext]';
+};
 
 var jsx_loaders = ["babel-loader"];
 var client_entry = [
@@ -41,7 +50,6 @@ var plugins = [
 ];
 
 if (!isProduction) {
-  JS_FILENAME = '[name].bundle.js';
   jsx_loaders.unshift({loader: 'react-hot-loader'});
   client_entry.push('webpack-hot-middleware/client');
   client_entry.push('webpack/hot/dev-server');
@@ -49,16 +57,6 @@ if (!isProduction) {
     new webpack.HotModuleReplacementPlugin()
   );
 };
-
-function isExternal(module) {
-  var context = module.context;
-
-  if (typeof context !== 'string') {
-    return false;
-  }
-
-  return context.indexOf('node_modules') !== -1;
-}
 
 
 const clientConfig = {
@@ -71,14 +69,57 @@ const clientConfig = {
     publicPath: '/'
   },
   module: {
-    rules: commonConfig.rules
+    rules: commonConfig.rules.concat([
+      {
+        test: /\.woff2?$|\.ttf$|\.eot$|\.svg$/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "build/" + ASSET_FILENAME
+            }
+          }
+        ]
+      },
+      {
+        test: /\.scss$/,
+        use: ExtractTextPlugin.extract({
+          fallback: "style-loader",
+          use: [
+            {
+              loader: "css-loader",
+              options: {
+                sourceMap: true
+              }
+            },
+            {
+              loader: 'resolve-url-loader'
+            },
+            {
+              loader: 'postcss-loader',
+              options: {
+                sourceMap: true
+              }
+            },
+            {
+              loader: "sass-loader",
+              options: {
+                sourceMap: true
+              }
+            }
+          ]
+        })
+      }
+    ])
   },
   stats: {
     colors: true
   },
   resolve: commonConfig.resolve,
   devtool: 'source-map',
-  plugins: plugins
+  plugins: plugins.concat([
+    new ExtractTextPlugin('build/' + CSS_FILENAME)
+  ])
 };
 
 module.exports = clientConfig;

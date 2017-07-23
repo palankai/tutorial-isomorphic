@@ -17,7 +17,6 @@ const presets = JSON.parse(fs.readFileSync(path.resolve(__dirname, '.babelrc'), 
 
 var jsx_loaders = ["babel-loader"];
 var client_entry = [
-  "babel-polyfill",
   path.resolve(__dirname, 'src', 'client')
 ];
 var plugins = [

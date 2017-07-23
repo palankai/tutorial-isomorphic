@@ -9,7 +9,6 @@ const serverConfig = {
   name: 'server',
   target: 'node',
   entry: [
-    "babel-polyfill",
     path.resolve(__dirname, 'src', 'server'),
   ],
   output: {

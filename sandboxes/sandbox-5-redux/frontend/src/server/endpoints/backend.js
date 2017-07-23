@@ -6,6 +6,9 @@ const handler = (request, response) => {
        content: 'Hello'
       },
       {id: 2,
+       content: 'React'
+      },
+      {id: 3,
        content: 'world'
       }
     ]

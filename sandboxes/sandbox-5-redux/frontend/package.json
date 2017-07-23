@@ -6,7 +6,7 @@
     "build:dev": "webpack --progress",
     "build": "NODE_ENV=production webpack -p --progress",
     "test": "jest",
-    "dev": "babel-node src/server",
+    "dev": "TMPDIR=/tmp babel-watch -x src/ --watch src/server/ src/server",
     "start": "NODE_ENV=production node /var/lib/frontend/server.js"
   },
   "jest": {

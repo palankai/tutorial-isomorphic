@@ -7,7 +7,6 @@ import Header from 'components/Header';
 
 
 class TextInput extends React.Component {
-
   constructor(props) {
     super(props);
     this.onChange = props.onChange;
@@ -23,9 +22,9 @@ class TextInput extends React.Component {
     return (
       <span>
         <input
-        type="text"
-        onChange={e => this.handleChange(e)}
-        defaultValue={this.props.default}
+          type="text"
+          onChange={e => this.handleChange(e)}
+          defaultValue={this.props.defaultValue}
         />
         <span>{this.state.len}</span>
       </span>
@@ -35,13 +34,14 @@ class TextInput extends React.Component {
   handleChange(event) {
     const value = event.target.value;
     this.setState((prevState, props) => ({
-      value: value,
+      value,
       len: value.length
     }));
     this.onChange(value, this.name);
   }
 }
 TextInput.propTypes = {
+  onChange: PropTypes.func,
   name: PropTypes.string.isRequired,
   defaultValue: PropTypes.string
 };
@@ -62,12 +62,12 @@ class Form extends React.Component {
 
   render() {
     return (
-        <form onSubmit={e => this.onSubmitHandler(e)} key={this.state.index}>
-        <TextInput name="firstName" onChange={(v,n) => this.onChangeControl(n, v)} default={this.default.firstName}/>
-        <TextInput name="lastName" onChange={(v,n) => this.onChangeControl(n, v)} default={this.default.lastName}/>
+      <form onSubmit={e => this.onSubmitHandler(e)} key={this.state.index}>
+        <TextInput name="firstName" onChange={(v, n) => this.onChangeControl(n, v)} default={this.default.firstName}/>
+        <TextInput name="lastName" onChange={(v, n) => this.onChangeControl(n, v)} default={this.default.lastName}/>
         <input type="submit" />
         <p>{this.state.firstName} + {this.state.lastName}</p>
-    </form>
+      </form>
     );
   }
 
@@ -81,21 +81,18 @@ class Form extends React.Component {
     }));
   }
 
-  reset() {
-  }
-
   onChangeControl(name, value) {
     this.setState((prevState, props) => ({
       ...prevState,
       [name]: value
     }));
   }
-
-};
+}
 
 Form.propTypes = {
   firstName: PropTypes.string.isRequired,
-  lastName: PropTypes.string.isRequired
+  lastName: PropTypes.string.isRequired,
+  dispatch: PropTypes.func.isRequired
 };
 
 
@@ -108,13 +105,8 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {};
-};
-
 const FormContainer = connect(
-  mapStateToProps//,
-  //mapDispatchToProps
+  mapStateToProps
 )(Form);
 
 const SubmitScene = () => (

@@ -1,3 +1,5 @@
+const path = require('path');
+
 const rules = [
   {
     test: /\.jsx?$/,
@@ -7,7 +9,11 @@ const rules = [
 ];
 
 const resolve = {
-  extensions: ['.js', '.jsx']
+  extensions: ['.js', '.jsx'],
+  modules: [
+    path.resolve(__dirname, 'src'),
+    'node_modules'
+  ]
 };
 
 module.exports = {

@@ -1,12 +1,13 @@
 import express from 'express';
 
+const webpackDevHelper = require('./dev.js');
+
 function configure(app, config) {
-  if( config.isProduction ) {
+  if (config.isProduction) {
     app.use(express.static(config.STATIC_PATH));
   }
 
-  if( !config.isProduction) {
-    const webpackDevHelper = require('./dev.js');
+  if (!config.isProduction) {
     webpackDevHelper.useWebpackMiddleware(app);
   }
 }

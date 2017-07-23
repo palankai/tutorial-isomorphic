@@ -1,7 +1,7 @@
 import { getFromServer } from 'client/api';
 
 
-export const submitForm = (formData) => ({
+export const submitForm = formData => ({
   type: 'SUBMIT_FORM',
   formData
 });
@@ -10,22 +10,20 @@ export const requestFromServer = () => ({
   type: 'REQUEST'
 });
 
-export const receiveFromServer = (items) => ({
+export const receiveFromServer = items => ({
   type: 'RESPONSE',
   createdAt: Date.now(),
-  items: items
+  items
 });
 
-export const unmount = (items) => ({
+export const unmount = () => ({
   type: 'UNMOUNT',
   createdAt: Date.now()
 });
 
-export const fetchFromServer = () => {
-  return dispatch => {
-    dispatch(requestFromServer());
-    return getFromServer().then(data => {
-      dispatch(receiveFromServer(data.items));
-    });
-  };
+export const fetchFromServer = () => (dispatch) => {
+  dispatch(requestFromServer());
+  return getFromServer().then((data) => {
+    dispatch(receiveFromServer(data.items));
+  });
 };

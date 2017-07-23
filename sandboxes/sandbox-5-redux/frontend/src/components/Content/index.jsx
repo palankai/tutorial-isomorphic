@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 
-const Content = ({text}) => (
+const Content = ({ text }) => (
   <div>
     <p>This is my first ReactJS page</p>
     <p>{text}</p>
@@ -15,16 +15,12 @@ Content.propTypes = {
 };
 
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    text: state.content || 'nada'
-  };
-};
+const mapStateToProps = (state, ownProps) => ({
+  text: state.content || 'nada'
+});
 
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {};
-};
+const mapDispatchToProps = (dispatch, ownProps) => ({});
 
 
 const ContentWithText = connect(

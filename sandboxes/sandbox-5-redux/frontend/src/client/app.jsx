@@ -10,7 +10,9 @@ import thunk from 'redux-thunk';
 import routes from 'routes';
 import reducer from 'store/reducers';
 
+// eslint-disable-next-line no-underscore-dangle
 const preloadedState = window.__PRELOADED_STATE__;
+// eslint-disable-next-line no-underscore-dangle
 delete window.__PRELOADED_STATE__;
 
 const store = createStore(

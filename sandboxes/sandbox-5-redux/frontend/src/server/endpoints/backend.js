@@ -2,14 +2,14 @@ const handler = (request, response) => {
   response.setHeader('Content-Type', 'application/json');
   response.send(JSON.stringify({
     items: [
-      {id: 1,
-       content: 'Hello'
+      { id: 1,
+        content: 'Hello'
       },
-      {id: 2,
-       content: 'React'
+      { id: 2,
+        content: 'React'
       },
-      {id: 3,
-       content: 'world'
+      { id: 3,
+        content: 'world'
       }
     ]
   }));

@@ -3,15 +3,14 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 
 import PropTypes from 'prop-types';
-import { fetchFromServer, unmount } from 'store/actions';
+import { unmount } from 'store/actions';
 import Header from 'components/Header';
 import { Button, Glyphicon } from 'react-bootstrap';
 
 class ComplexListScene extends React.Component {
-
   constructor(props) {
     super(props);
-    if( !props.status ) {
+    if (!props.status) {
       this.invalidate();
     }
     this.state = {
@@ -22,9 +21,9 @@ class ComplexListScene extends React.Component {
 
   componentWillReceiveProps() {
     this.setState((prevState, props) => ({
-        ...prevState,
-        status: props.status,
-        items: props.items
+      ...prevState,
+      status: props.status,
+      items: props.items
     }));
   }
 
@@ -34,20 +33,20 @@ class ComplexListScene extends React.Component {
 
   render() {
     return (
-        <div>
-          <Header />
-          <p>Simple List of values from server side... {this.state.status}</p>
-          <ul>
-            {this.state.items.map((item) => (
-              <li key={item.id}>#{item.id}: {item.content}</li>
-            ))}
-          </ul>
+      <div>
+        <Header />
+        <p>Simple List of values from server side... {this.state.status}</p>
+        <ul>
+          {this.state.items.map(item => (
+            <li key={item.id}>#{item.id}: {item.content}</li>
+          ))}
+        </ul>
         <Button bsStyle="primary">
           <Glyphicon glyph="star" />
           Primary
         </Button>
-          <button className="btn btn-default" onClick={e => this.invalidate()}>Refresh</button>
-        </div>
+        <button className="btn btn-default" onClick={e => this.invalidate()}>Refresh</button>
+      </div>
     );
   }
 
@@ -57,25 +56,31 @@ class ComplexListScene extends React.Component {
   }
 }
 
+ComplexListScene.propTypes = {
+  status: PropTypes.string,
+  items: PropTypes.array,
+  dispatch: PropTypes.func.isRequired,
+  route: PropTypes.object.isRequired
+};
+
 const mapStateToProps = (state, ownProps) => {
-  let props = state.listScene || {
+  const props = state.listScene || {
     items: []
   };
   return props;
 };
 
-
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    onInvalid: () => {
-      dispatch(fetchFromServer());
-    }
-  };
-};
+/*
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  onInvalid: () => {
+    dispatch(fetchFromServer());
+  }
+});
+*/
 
 const ListSceneContainer = withRouter(connect(
-  mapStateToProps//,
-  //mapDispatchToProps
+  mapStateToProps// ,
+  // mapDispatchToProps
 )(ComplexListScene));
 
 export default ListSceneContainer;

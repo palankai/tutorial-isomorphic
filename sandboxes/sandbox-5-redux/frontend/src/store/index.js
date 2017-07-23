@@ -3,9 +3,9 @@ import thunk from 'redux-thunk';
 import reducer from './reducers';
 
 
-export const configureStore = () => {
-  return createStore(
-    reducer,
-    applyMiddleware(thunk)
-  );
-};
+const configureStore = () => createStore(
+  reducer,
+  applyMiddleware(thunk)
+);
+
+export default configureStore;

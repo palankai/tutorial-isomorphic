@@ -1,9 +1,9 @@
 import React from 'react';
-import {shallow} from 'enzyme';
+import { shallow } from 'enzyme';
 
-import IndexScene from '../../src/scenes/Index';
-import Header from '../../src/components/Header';
-import Content from '../../src/components/Content';
+import IndexScene from 'scenes/Index';
+import Header from 'components/Header';
+import Content from 'components/Content';
 
 test('Index scene contains Header and Content', () => {
   const scene = shallow(<IndexScene />);

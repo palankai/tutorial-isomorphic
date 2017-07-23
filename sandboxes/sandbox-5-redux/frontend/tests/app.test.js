@@ -2,9 +2,9 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { MemoryRouter } from 'react-router-dom';
 
-import App from '../src/app.jsx';
-import IndexScene from '../src/scenes/Index';
-import AboutScene from '../src/scenes/About';
+import App from 'app';
+import IndexScene from 'scenes/Index';
+import AboutScene from 'scenes/About';
 
 test('App contains IndexScene', () => {
   const app = mount(
@@ -18,7 +18,7 @@ test('App contains IndexScene', () => {
 
 test('App contains AboutScene on /about', () => {
   const app = mount(
-    <MemoryRouter initialEntries={[ '/about' ]}>
+    <MemoryRouter initialEntries={['/about']}>
       <App />
     </MemoryRouter>
   );

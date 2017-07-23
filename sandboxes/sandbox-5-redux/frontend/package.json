@@ -8,7 +8,8 @@
     "test": "jest",
     "dev": "TMPDIR=/tmp babel-watch -x src/ --watch src/server/ src/server",
     "start": "NODE_ENV=production node /var/lib/frontend/server.js",
-    "lint": "eslint ."
+    "lint": "eslint . --ext .js,.jsx",
+    "lint:fix": "eslint . --ext .js,.jsx --fix"
   },
   "jest": {
     "cacheDirectory": "./node_modules/.cache/jest"
@@ -16,24 +17,48 @@
   "eslintConfig": {
     "parser": "babel-eslint",
     "plugins": [
-        "react"
+      "react",
+      "import"
     ],
     "rules": {
-        "comma-dangle": ["error", "never"]
+      "comma-dangle": [
+        "error",
+        "never"
+      ],
+      "no-unused-vars": [
+        "error",
+        {
+          "vars": "all",
+          "args": "none",
+          "ignoreRestSiblings": true
+        }
+      ]
     },
     "env": {
-        "browser": true,
-        "commonjs": true,
-        "node": true,
-        "jest": true
+      "browser": true,
+      "commonjs": true,
+      "node": true,
+      "jest": true
     },
-    "extends": ["eslint:recommended", "plugin:react/recommended", "airbnb-base"]
+    "settings": {
+      "import/resolver": {
+        "webpack": {
+          "config": "webpack.config.client.js"
+        }
+      }
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "airbnb-base"
+    ]
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "autoprefixer": "^7.1.2",
     "axios": "^0.16.2",
     "babel-core": "^6.25.0",
     "babel-loader": "^7.1.1",
@@ -69,6 +94,8 @@
     "serialize-javascript": "^1.4.0",
     "style-loader": "^0.18.2",
     "webpack": "^3.1.0",
+    "webpack-dev-middleware": "^1.11.0",
+    "webpack-hot-middleware": "^2.18.2",
     "webpack-manifest-plugin": "^1.1.2"
   },
   "devDependencies": {
@@ -79,6 +106,7 @@
     "enzyme": "^2.9.1",
     "eslint": "^4.3.0",
     "eslint-config-airbnb": "^15.0.2",
+    "eslint-import-resolver-webpack": "^0.8.3",
     "eslint-loader": "^1.9.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^6.0.2",
@@ -86,8 +114,6 @@
     "jest": "^20.0.4",
     "react-hot-loader": "^1.3.1",
     "react-test-renderer": "^15.6.1",
-    "redux-devtools": "^3.4.0",
-    "webpack-dev-middleware": "^1.11.0",
-    "webpack-hot-middleware": "^2.18.2"
+    "redux-devtools": "^3.4.0"
   }
 }

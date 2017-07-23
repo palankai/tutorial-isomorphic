@@ -1,6 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-
 import React from 'react';
 import { StaticRouter } from 'react-router';
 import { matchRoutes, renderRoutes } from 'react-router-config';
@@ -9,35 +6,38 @@ import { Provider } from 'react-redux';
 import serialize from 'serialize-javascript';
 
 import routes from 'routes';
-import { configureStore } from 'store';
+import configureStore from 'store';
 
 
 function preload(branch) {
   const store = configureStore();
-  let promises = [];
-  branch.map(({route}) => {
-    if( route.action ) {
+  const promises = [];
+  branch.map(({ route }) => {
+    if (route.action) {
       promises.push(store.dispatch(route.action()));
     }
+    return null;
   });
-  return new Promise(function(resolve, reject) {
+  return new Promise(((resolve) => {
     Promise.all(promises).then(() => {
       resolve(store);
     });
-  });
+  }));
 }
 
 function renderHTML(html, scripts, styles, state) {
   let script = '';
   let style = '';
-  if( state ) {
+  if (state) {
     script += `<script>window.__PRELOADED_STATE__ = ${serialize(state)};</script>`;
   }
-  scripts.map(filename => {
+  scripts.map((filename) => {
     script += `<script src="${filename}"></script>`;
+    return null;
   });
-  styles.map(filename => {
+  styles.map((filename) => {
     style += `<link rel="stylesheet" href="${filename}">`;
+    return null;
   });
   return `<!DOCTYPE html>
     <html>
@@ -56,8 +56,8 @@ function renderHTML(html, scripts, styles, state) {
 
 function handler(request, response, config) {
   const branch = matchRoutes(routes, request.url);
-  const context={};
-  return preload(branch).then(store => {
+  const context = {};
+  return preload(branch).then((store) => {
     const html = renderToString(
       <StaticRouter location={request.url} context={context}>
         <Provider store={store}>
@@ -73,13 +73,13 @@ function handler(request, response, config) {
     const styles = [
       'css/bootstrap.min.css',
       'css/bootstrap-theme.min.css',
-      config.manifest['client.css'],
+      config.manifest['client.css']
     ];
     response.send(renderHTML(
       html, scripts, styles, store.getState()
     ));
   });
-};
+}
 
 
 function configure(app, config) {

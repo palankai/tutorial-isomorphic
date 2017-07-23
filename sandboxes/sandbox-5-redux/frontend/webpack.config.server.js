@@ -1,6 +1,5 @@
-var path = require('path');
-var webpack = require('webpack');
-var commonConfig = require('./webpack.config.common.js');
+const path = require('path');
+const commonConfig = require('./webpack.config.common.js');
 
 const BUILD_PATH = path.resolve(process.env.BUILD_PATH);
 
@@ -9,7 +8,7 @@ const serverConfig = {
   name: 'server',
   target: 'node',
   entry: [
-    path.resolve(__dirname, 'src', 'server'),
+    path.resolve(__dirname, 'src', 'server')
   ],
   output: {
     path: BUILD_PATH,

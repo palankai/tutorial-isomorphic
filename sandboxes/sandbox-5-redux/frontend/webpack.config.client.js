@@ -5,6 +5,7 @@ var path = require('path');
 var webpack = require('webpack');
 var ManifestPlugin = require('webpack-manifest-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 var commonConfig = require('./webpack.config.common.js');
 
@@ -118,7 +119,10 @@ const clientConfig = {
   resolve: commonConfig.resolve,
   devtool: 'source-map',
   plugins: plugins.concat([
-    new ExtractTextPlugin('build/' + CSS_FILENAME)
+    new ExtractTextPlugin('build/' + CSS_FILENAME),
+    new CopyWebpackPlugin([
+      {from: 'public/', to: BUILD_PATH + '/www'}
+    ])
   ])
 };
 

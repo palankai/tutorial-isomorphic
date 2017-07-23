@@ -71,7 +71,9 @@ function handler(request, response, config) {
       config.manifest['client.js']
     ];
     const styles = [
-      config.manifest['client.css']
+      'css/bootstrap.min.css',
+      'css/bootstrap-theme.min.css',
+      config.manifest['client.css'],
     ];
     response.send(renderHTML(
       html, scripts, styles, store.getState()

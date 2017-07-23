@@ -1,16 +1,17 @@
 var path = require('path');
 var webpack = require('webpack');
-var client_config = require('./webpack.config.js');
+var commonConfig = require('./webpack.config.common.js');
 
 const BUILD_PATH = path.resolve(process.env.BUILD_PATH);
-const rules = client_config.rules;
-const resolve = client_config.resolve;
 
 
 const serverConfig = {
   name: 'server',
   target: 'node',
-  entry: path.resolve(__dirname, 'src', 'server.js'),
+  entry: [
+    "babel-polyfill",
+    path.resolve(__dirname, 'src', 'server'),
+  ],
   output: {
     path: BUILD_PATH,
     filename: 'server.js',
@@ -18,9 +19,9 @@ const serverConfig = {
   },
   externals: /^[a-z\-0-9]+$/,
   module: {
-    rules: rules
+    rules: commonConfig.rules
   },
-  resolve: resolve
+  resolve: commonConfig.resolve
 };
 
 module.exports = serverConfig;

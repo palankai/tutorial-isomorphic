@@ -27,14 +27,14 @@ function preload(branch) {
   });
 }
 
-function renderHTML(html, clientFileName, state) {
+function renderHTML(html, scripts, state) {
   let script = '';
   if( state ) {
     script += `<script>window.__PRELOADED_STATE__ = ${serialize(state)};</script>`;
   }
-  if( clientFileName ) {
-    script += `<script src="${clientFileName}"></script>`;
-  }
+  scripts.map(filename => {
+    script += `<script src="${filename}"></script>`;
+  });
   return `<!DOCTYPE html>
     <html>
       <head>
@@ -60,8 +60,13 @@ function handler(request, response, config) {
         </Provider>
       </StaticRouter>
     );
+    const scripts = [
+      config.manifest['manifest.js'],
+      config.manifest['vendor.js'],
+      config.manifest['client.js']
+    ];
     response.send(renderHTML(
-      html, config.manifest['client.js'], store.getState()
+      html, scripts, store.getState()
     ));
   });
 };

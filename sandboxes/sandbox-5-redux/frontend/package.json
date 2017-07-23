@@ -5,7 +5,6 @@
   "scripts": {
     "build:dev": "webpack --progress",
     "build": "NODE_ENV=production webpack -p --progress",
-    "build:server": "NODE_ENV=production webpack -p --progress --config webpack.config.server.js",
     "test": "jest",
     "dev": "babel-node src/server",
     "start": "NODE_ENV=production node /var/lib/frontend/server.js"

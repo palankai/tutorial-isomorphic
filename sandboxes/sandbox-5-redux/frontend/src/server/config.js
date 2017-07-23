@@ -3,7 +3,11 @@ import path from 'path';
 
 function readManifest(manifestPath, isProduction) {
   if(!isProduction) {
-    return {'client.js': 'build/client.bundle.js'};
+    return {
+      'client.js': 'build/client.bundle.js',
+      'manifest.js': 'build/manifest.bundle.js',
+      'vendor.js': 'build/vendor.bundle.js'
+    };
   }
   return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 }

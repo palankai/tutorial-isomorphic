@@ -6,7 +6,7 @@ function configure(app, config) {
   }
 
   if( !config.isProduction) {
-    const webpackDevHelper = require('../dev.js');
+    const webpackDevHelper = require('./dev.js');
     webpackDevHelper.useWebpackMiddleware(app);
   }
 }

@@ -15,11 +15,9 @@ RUN npm install
 
 COPY . .
 
-RUN npm run test
+#RUN npm run test
 
 RUN npm run build
-
-RUN npm run build:server
 
 EXPOSE 8000
 

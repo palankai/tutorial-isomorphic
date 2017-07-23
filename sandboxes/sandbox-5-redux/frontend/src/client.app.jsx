@@ -9,7 +9,7 @@ import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
 import routes from './routes';
-import reducer from './reducers';
+import reducer from './store/reducers';
 
 const preloadedState = window.__PRELOADED_STATE__;
 delete window.__PRELOADED_STATE__;

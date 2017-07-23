@@ -1,7 +1,7 @@
 var webpack = require('webpack'),
     webpackDevMiddleware = require('webpack-dev-middleware'),
     webpackHotMiddleware = require('webpack-hot-middleware'),
-    webpackconfig = require('../webpack.config.js').default,
+    webpackconfig = require('../../webpack.config.js').default,
     webpackcompiler = webpack(webpackconfig);
 
 //enable webpack middleware for hot-reloads in development

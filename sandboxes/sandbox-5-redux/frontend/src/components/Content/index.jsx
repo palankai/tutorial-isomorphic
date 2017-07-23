@@ -17,7 +17,7 @@ Content.propTypes = {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    text: state.content
+    text: state.content || 'nada'
   };
 };
 

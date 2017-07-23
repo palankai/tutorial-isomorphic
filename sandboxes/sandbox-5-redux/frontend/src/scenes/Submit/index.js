@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { submitForm } from '../../actions';
+import { submitForm } from '../../store/actions';
 import Header from '../../components/Header';
 
 
@@ -74,7 +74,6 @@ class Form extends React.Component {
   onSubmitHandler(e) {
     e.preventDefault();
     this.dispatch(submitForm(this.state));
-    console.log(this.default);
     this.setState((prevState, props) => ({
       index: prevState.index + 1,
       firstName: '',

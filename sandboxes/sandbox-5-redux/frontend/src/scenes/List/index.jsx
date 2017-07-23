@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 
 import PropTypes from 'prop-types';
-import { fetchFromServer, unmount } from '../../actions';
+import { fetchFromServer, unmount } from '../../store/actions';
 import Header from '../../components/Header';
 
 class ComplexListScene extends React.Component {
@@ -14,7 +14,7 @@ class ComplexListScene extends React.Component {
       this.invalidate();
     }
     this.state = {
-      items: props.items,
+      items: props.items || [],
       status: props.status || 'invalid'
     };
   }

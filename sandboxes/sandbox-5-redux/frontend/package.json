@@ -7,8 +7,7 @@
     "build": "NODE_ENV=production webpack -p --progress",
     "build:server": "NODE_ENV=production webpack -p --progress --config webpack.config.server.js",
     "test": "jest",
-    "dev:client": "RENDER_SERVER=false babel-node src/server.js",
-    "dev:server": "RENDER_CLIENT=false babel-node src/server.js",
+    "dev": "babel-node src/server",
     "start": "NODE_ENV=production node /var/lib/frontend/server.js"
   },
   "jest": {

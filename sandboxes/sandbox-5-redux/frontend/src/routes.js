@@ -4,7 +4,7 @@ import SubmitScene from './scenes/Submit';
 import ListScene from './scenes/List';
 import Root from './components/Root';
 
-import { fetchFromServer } from './actions';
+import { fetchFromServer } from './store/actions';
 
 const routes = [
   { component: Root,

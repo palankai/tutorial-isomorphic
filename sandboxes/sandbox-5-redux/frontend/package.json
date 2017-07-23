@@ -33,6 +33,7 @@
     "express": "^4.15.3",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.11.2",
+    "ignore-styles": "^5.0.1",
     "node-sass": "^4.5.3",
     "postcss-loader": "^2.0.6",
     "prop-types": "^15.5.10",

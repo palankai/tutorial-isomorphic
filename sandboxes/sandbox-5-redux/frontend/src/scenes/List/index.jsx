@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
 
 import PropTypes from 'prop-types';
-import { fetchFromServer, unmount } from '../../store/actions';
-import Header from '../../components/Header';
+import { fetchFromServer, unmount } from 'store/actions';
+import Header from 'components/Header';
 
 class ComplexListScene extends React.Component {
 

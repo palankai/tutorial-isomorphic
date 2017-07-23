@@ -1,4 +1,4 @@
-import { getFromServer } from '../api';
+import { getFromServer } from 'client/api';
 
 
 export const submitForm = (formData) => ({

@@ -1,10 +1,10 @@
-import IndexScene from './scenes/Index';
-import AboutScene from './scenes/About';
-import SubmitScene from './scenes/Submit';
-import ListScene from './scenes/List';
-import Root from './components/Root';
+import IndexScene from 'scenes/Index';
+import AboutScene from 'scenes/About';
+import SubmitScene from 'scenes/Submit';
+import ListScene from 'scenes/List';
+import Root from 'components/Root';
 
-import { fetchFromServer } from './store/actions';
+import { fetchFromServer } from 'store/actions';
 
 const routes = [
   { component: Root,

@@ -8,8 +8,8 @@ import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
 import serialize from 'serialize-javascript';
 
-import routes from '../../routes';
-import { configureStore } from '../../store';
+import routes from 'routes';
+import { configureStore } from 'store';
 
 
 function preload(branch) {

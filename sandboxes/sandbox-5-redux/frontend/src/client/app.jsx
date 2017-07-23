@@ -7,8 +7,8 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
-import routes from '../routes';
-import reducer from '../store/reducers';
+import routes from 'routes';
+import reducer from 'store/reducers';
 
 const preloadedState = window.__PRELOADED_STATE__;
 delete window.__PRELOADED_STATE__;

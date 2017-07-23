@@ -1,7 +1,7 @@
 import React from 'react';
 
-import Header from '../../components/Header';
-import AboutContent from '../../components/AboutContent';
+import Header from 'components/Header';
+import AboutContent from 'components/AboutContent';
 
 const AboutScene = () => (
   <div>

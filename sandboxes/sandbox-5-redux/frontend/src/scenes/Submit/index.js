@@ -2,15 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { submitForm } from '../../store/actions';
-import Header from '../../components/Header';
+import { submitForm } from 'store/actions';
+import Header from 'components/Header';
 
 
 class TextInput extends React.Component {
-  static propTypes = {
-      name: PropTypes.string.isRequired,
-      defaultValue: PropTypes.string
-  };
 
   constructor(props) {
     super(props);
@@ -45,6 +41,10 @@ class TextInput extends React.Component {
     this.onChange(value, this.name);
   }
 }
+TextInput.propTypes = {
+  name: PropTypes.string.isRequired,
+  defaultValue: PropTypes.string
+};
 
 class Form extends React.Component {
   constructor(props) {

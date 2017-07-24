@@ -1,6 +1,6 @@
 export default class API {
   getItems() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(((resolve, reject) => {
       resolve({
         items: [
           { id: 1,
@@ -12,8 +12,8 @@ export default class API {
           { id: 3,
             content: 'WORLD'
           }
-        ]}
+        ] }
       );
-    });
+    }));
   }
 }

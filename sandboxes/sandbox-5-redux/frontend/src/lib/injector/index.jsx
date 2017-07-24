@@ -32,7 +32,6 @@ export default function createInjector(contextShape) {
   Injector.childContextTypes = contextShape;
 
   function inject(Component) {
-
     class Inject extends React.Component {
       constructor(props, context) {
         super(props, context);
@@ -63,7 +62,6 @@ export default function createInjector(contextShape) {
     return Inject;
   }
 
-  console.log('Injector created');
   return {
     inject,
     Injector

@@ -44,7 +44,9 @@
           "args": "none",
           "ignoreRestSiblings": true
         }
-      ]
+      ],
+      "class-methods-use-this": ["warn"],
+      "array-callback-return": ["warn"]
     },
     "env": {
       "browser": true,

@@ -53,7 +53,6 @@ class ComplexListScene extends React.Component {
   }
 
   invalidate() {
-    console.log(this.props.api);
     const action = this.props.route.action(this.props.api);
     this.props.dispatch(action);
   }
@@ -63,7 +62,8 @@ ComplexListScene.propTypes = {
   status: PropTypes.string,
   items: PropTypes.array,
   dispatch: PropTypes.func.isRequired,
-  route: PropTypes.object.isRequired
+  route: PropTypes.object.isRequired,
+  api: PropTypes.object.isRequired
 };
 
 const mapStateToProps = (state, ownProps) => {

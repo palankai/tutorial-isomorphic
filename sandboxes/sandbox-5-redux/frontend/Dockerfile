@@ -17,6 +17,8 @@ COPY . .
 
 #RUN npm run test
 
+RUN npm run lint
+
 RUN npm run build
 
 EXPOSE 8000

@@ -6,4 +6,10 @@ export const getFromServer = () => new Promise(async (resolve, reject) => {
   resolve(response.data);
 });
 
-export default {};
+class API {
+  getItems() {
+    return getFromServer();
+  }
+}
+
+export default API;

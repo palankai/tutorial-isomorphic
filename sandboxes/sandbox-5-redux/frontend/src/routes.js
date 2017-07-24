@@ -21,8 +21,8 @@ const routes = [
       },
       { path: '/list',
         component: ListScene,
-        action() {
-          return fetchFromServer();
+        action(api) {
+          return fetchFromServer(api);
         }
       }
     ]

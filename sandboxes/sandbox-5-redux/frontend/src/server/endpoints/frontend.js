@@ -7,6 +7,10 @@ import serialize from 'serialize-javascript';
 
 import routes from 'routes';
 import configureStore from 'store';
+import API from '../api';
+import { Injector } from 'lib/inject';
+
+const api = new API();
 
 
 function preload(branch) {
@@ -14,7 +18,7 @@ function preload(branch) {
   const promises = [];
   branch.map(({ route }) => {
     if (route.action) {
-      promises.push(store.dispatch(route.action()));
+      promises.push(store.dispatch(route.action(api)));
     }
     return null;
   });
@@ -59,11 +63,13 @@ function handler(request, response, config) {
   const context = {};
   return preload(branch).then((store) => {
     const html = renderToString(
-      <StaticRouter location={request.url} context={context}>
-        <Provider store={store}>
-          {renderRoutes(routes)}
-        </Provider>
-      </StaticRouter>
+        <Injector api={api}>
+          <StaticRouter location={request.url} context={context}>
+            <Provider store={store}>
+              {renderRoutes(routes)}
+            </Provider>
+          </StaticRouter>
+        </Injector>
     );
     const scripts = [
       config.manifest['manifest.js'],

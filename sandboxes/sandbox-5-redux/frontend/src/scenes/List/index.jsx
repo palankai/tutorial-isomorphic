@@ -7,6 +7,8 @@ import { unmount } from 'store/actions';
 import Header from 'components/Header';
 import { Button, Glyphicon } from 'react-bootstrap';
 
+import { inject } from 'lib/inject';
+
 class ComplexListScene extends React.Component {
   constructor(props) {
     super(props);
@@ -51,7 +53,8 @@ class ComplexListScene extends React.Component {
   }
 
   invalidate() {
-    const action = this.props.route.action();
+    console.log(this.props.api);
+    const action = this.props.route.action(this.props.api);
     this.props.dispatch(action);
   }
 }
@@ -81,6 +84,6 @@ const mapDispatchToProps = (dispatch, ownProps) => ({
 const ListSceneContainer = withRouter(connect(
   mapStateToProps// ,
   // mapDispatchToProps
-)(ComplexListScene));
+)(inject(ComplexListScene)));
 
 export default ListSceneContainer;

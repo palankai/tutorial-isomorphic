@@ -21,9 +21,9 @@ export const unmount = () => ({
   createdAt: Date.now()
 });
 
-export const fetchFromServer = () => (dispatch) => {
+export const fetchFromServer = (api) => (dispatch) => {
   dispatch(requestFromServer());
-  return getFromServer().then((data) => {
+  return api.getItems().then((data) => {
     dispatch(receiveFromServer(data.items));
   });
 };

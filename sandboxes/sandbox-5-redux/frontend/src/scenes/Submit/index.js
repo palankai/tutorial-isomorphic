@@ -26,7 +26,7 @@ class TextInput extends React.Component {
           onChange={e => this.handleChange(e)}
           defaultValue={this.props.defaultValue}
         />
-        <span>{this.state.len}</span>
+        <span>{this.state.len} {this.props.someText}</span>
       </span>
     );
   }
@@ -63,10 +63,10 @@ class Form extends React.Component {
   render() {
     return (
       <form onSubmit={e => this.onSubmitHandler(e)} key={this.state.index}>
-        <TextInput name="firstName" onChange={(v, n) => this.onChangeControl(n, v)} default={this.default.firstName}/>
+        <TextInput name="firstName" someText="bbb" onChange={(v, n) => this.onChangeControl(n, v)} default={this.default.firstName}/>
         <TextInput name="lastName" onChange={(v, n) => this.onChangeControl(n, v)} default={this.default.lastName}/>
         <input type="submit" />
-        <p>{this.state.firstName} + {this.state.lastName}</p>
+        <p>{this.state.firstName} + {this.state.lastName} {this.props.someText}</p>
       </form>
     );
   }

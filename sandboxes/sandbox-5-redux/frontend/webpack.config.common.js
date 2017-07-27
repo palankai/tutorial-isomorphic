@@ -1,5 +1,12 @@
 const path = require('path');
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+const consts = {
+  isProduction,
+  BUILD_PATH: path.resolve(process.env.BUILD_PATH)
+};
+
 const rules = [
   {
     test: /\.jsx?$/,
@@ -18,5 +25,6 @@ const resolve = {
 
 module.exports = {
   rules,
-  resolve
+  resolve,
+  consts
 };

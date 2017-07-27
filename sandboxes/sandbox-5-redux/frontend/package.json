@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "build:bootstrap": "webpack --progress --config webpack.config.bootstrap.js",
     "build:dev": "webpack --progress",
     "build": "NODE_ENV=production webpack -p --progress",
     "test": "jest",

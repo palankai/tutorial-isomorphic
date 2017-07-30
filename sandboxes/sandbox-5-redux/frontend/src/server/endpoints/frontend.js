@@ -5,7 +5,7 @@ import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
 import serialize from 'serialize-javascript';
 
-import routes from 'routes';
+import routes from 'client/routes';
 import configureStore from 'store';
 import { Injector } from 'lib/inject';
 

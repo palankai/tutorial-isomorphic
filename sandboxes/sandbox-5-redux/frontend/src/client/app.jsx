@@ -7,7 +7,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 
-import routes from 'routes';
+import routes from './routes';
 import reducer from 'store/reducers';
 import { Injector } from 'lib/inject';
 import API from './api';

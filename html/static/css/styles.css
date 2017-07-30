@@ -60,9 +60,6 @@ h6, .h6 {
   font-size: 18px;
 }
 
-.app-adr-code {
-}
-
 /* Sidebar modules for boxing content */
 .sidebar-module {
   padding: 15px;
@@ -82,4 +79,25 @@ h6, .h6 {
 
 textarea {
     resize: vertical;
+}
+
+.SidebarItem {
+  padding: 15px;
+  margin: 0 -15px 15px;
+}
+
+/* Component */
+.Layout {
+}
+
+/* State */
+.Layout.is-selected {
+}
+
+/* Modifier */
+.Layout-small {
+}
+
+/* Child Component */
+.Layout-Title {
 }

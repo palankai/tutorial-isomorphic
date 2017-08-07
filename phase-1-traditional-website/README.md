@@ -193,9 +193,9 @@ Repeat our manual test:
 npm run start
 ```
 
-## Use greater JavaScript
+## Use latest JavaScript features
 
-Let's modify our javascript server code a bit.
+Let's modify our JavaScript server code a bit.
 
 ``` diff
 - const express = require('express');
@@ -258,6 +258,34 @@ configuration.
 
 We will improve that configuration later.
 
+## Improve our Dockerfile
+
+``` diff
+RUN ln -s $SRC_PATH/node_modules/ $BUILD_PATH/node_modules
+
+WORKDIR $SRC_PATH
+
++ COPY package.json .
++
++ RUN npm install
++
++ COPY . .
++
+- CMD ["ash"]
++ CMD ["npm", "run", "start"]
+```
+
+Let's rebuild our image and start the container again.
+
+``` shell
+# execute on the host
+
+docker-compose build
+
+docker-compose run --service-ports --rm tutorial-frontend
+```
+
+
 
 
 
@@ -265,7 +293,9 @@ We will improve that configuration later.
 
 
 
-We have to install [Babel](http://babeljs.io) to be able to compile our code.
+We have to install [Babel](http://babeljs.io) to be able to compile our c
+
+
 
 ## Create the working environment
 

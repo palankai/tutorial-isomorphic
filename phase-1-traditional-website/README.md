@@ -433,82 +433,112 @@ COPY . .
 CMD ["npm", "run", "start"]
 ```
 
+## Split up the code
 
-**FROM THIS POINT HAVE TO BE REORDERED**
+The last part of this tutorial is a small refactoring, we create
+3 endpoints for each page. As you can expect, we start modify our tests.
 
+Please modify the tests, remove every `.html` extension from the URLs
 
-
-We have to install [Babel](http://babeljs.io) to be able to compile our c
-
-
-
-## Create the working environment
-
-### We would like to use the latest javascript features, so install babel
-
-[Babel](http://babeljs.io) is a pluggable javascript compiler.
-You can read more [about babel plugins](http://babeljs.io/docs/plugins/).
+### Install ejs
+[ejs](http://ejs.co/) which is a simple template library that we can use.
+There are many more popular template engine for express, however we don't
+need much feature. This is mainly an intermediate stage, we will barely use
+templates later.
 
 ``` shell
 # execution inside the container
-npm install --save babel-cli babel-preset-env babel-preset-stage-0
-```
-
-The command above puts all of those dependencies to our `package.json` file.
-Through the tutorial we will install more babel plugins, but this will
-be enough to start our project.
-
-Add a new section into `package.json` which will contain our babel
-configuration.
-
-``` json
-"babel": {"presets": ["env", "stage-0"]}
-```
-
-_Note:_ You should be careful heavily rely on `stage-0` preset as it is very
-unstable, and it is likely to change in the future.
-
-### Install Webpack
-
-In this tutorial I use [Webpack](https://webpack.js.org)
-to build each small code fragments together. Webpack use different loaders
-and plugins to collect files and place to their destination bundled.
-
-``` shell
-# execution inside the container
-npm install --save webpack babel-loader
+npm install --save ejs
 ```
 
 
-## Make our website
+### Create different endpoints
 
-### Create the project folder structure
-
-``` shell
-# execute on the host
-
-# Create a folder for support files
-mkdir frontend/develop
-
-# Create a folder for the server side code
-mkdir frontend/server
-
-# Create a folder for public files
-mkdir frontend/public
-```
-
-Copy everything from the [html](../html) folder to our public directory.
-
-``` shell
-# execute on the host
-cp -R ../html/* frontend/public/
-```
-
-### Create our server
-
-Create a file inside the server folder: `start.js`
+Extend our `main.js` as it follows:
 
 ``` javascript
+const express = require('express');
+const app = express();
 
+
+app.get('/', function (req, res) {
+  res.send('Hello World!');
+});
+
+
+app.get('/submit', function (req, res) {
+  res.send('Hello World!');
+});
+
+
+app.get('/view', function (req, res) {
+  res.send('Hello World!');
+});
+
+
+app.use(express.static('public'));
+
+export default app;
 ```
 
+If we test our application again, one type of error solved after removing
+the `.html` suffixes, we get `200` responses from the app.
+
+
+### Introduce the templates
+
+First of all, we need to create a folder for our templates then
+move our html file to the place. We also rename them, set `.ejs` as extension.
+
+``` shell
+mkdir frontend/server/templates
+mv frontend/public/index.html frontend/server/templates/index.ejs
+mv frontend/public/submit.html frontend/server/templates/submit.ejs
+mv frontend/public/view.html frontend/server/templates/view.ejs
+```
+
+The final version of our `main.js` file the following:
+
+``` javascript
+import path from 'path';
+
+import express from 'express';
+
+
+const app = express();
+
+const TEMPLATE_PATH = path.join(process.env.SRC_PATH, 'server', 'templates');
+
+app.set('view engine', 'ejs');
+app.set('views', TEMPLATE_PATH);
+
+app.get('/', function (req, res) {
+  res.render('index');
+});
+
+
+app.get('/submit', function (req, res) {
+  res.render('submit');
+});
+
+
+app.get('/view', function (req, res) {
+  res.render('view');
+});
+
+app.use(express.static('public'));
+
+export default app;
+```
+
+Tests should pass
+
+
+### Fix links in the html files
+
+The last piece to fix is replacing the links, referring pages without `.html`
+suffix. I'm not going to show that, however you will find them as a base
+in the folder of the next chapter.
+
+
+Well done. If you've reached this point, you have a solid base code.

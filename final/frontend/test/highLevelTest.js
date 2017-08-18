@@ -31,7 +31,7 @@ describe('App', function() {
   describe('/submit', function() {
     it('responds with status 200', function(done) {
       chai.request(app)
-        .get('/submit.html')
+        .get('/submit')
         .end(function(err, res) {
           expect(res).to.have.status(200);
           done();
@@ -39,7 +39,7 @@ describe('App', function() {
     });
     it('response contains expected title', function(done) {
       chai.request(app)
-        .get('/submit.html')
+        .get('/submit')
         .end(function(err, res) {
           expect(res.text).to.have.string('Create new decision record');
           done();
@@ -49,7 +49,7 @@ describe('App', function() {
   describe('/view', function() {
     it('responds with status 200', function(done) {
       chai.request(app)
-        .get('/view.html')
+        .get('/view')
         .end(function(err, res) {
           expect(res).to.have.status(200);
           done();
@@ -57,7 +57,7 @@ describe('App', function() {
     });
     it('response contains expected title', function(done) {
       chai.request(app)
-        .get('/view.html')
+        .get('/view')
         .end(function(err, res) {
           expect(res.text).to.have.string('Conclusion');
           done();

@@ -7,6 +7,7 @@
     "babel-cli": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "babel-preset-stage-0": "^6.24.1",
+    "ejs": "^2.5.7",
     "express": "^4.15.4"
   },
   "devDependencies": {

@@ -150,7 +150,7 @@ Now we are going to create the server code.
 mkdir -p frontend/server
 ```
 
-Create a file inside our `server` folder, called `serve.js`.
+Create a file inside our `server` folder, called `main.js`.
 
 ``` javascript
 const express = require('express');
@@ -158,8 +158,16 @@ const app = express();
 
 app.use(express.static('public'));
 
+export default app;
+```
+
+And create a file next to it, called `serve.js`.
+
+``` javascript
+import app from './main';
+
 app.listen(8080, function () {
-  console.log('Example app listening on port 8080!')
+  console.log('Example app listening on port 8080!');
 });
 ```
 
@@ -285,8 +293,145 @@ docker-compose build
 docker-compose run --service-ports --rm tutorial-frontend
 ```
 
+## Create a test to check whether our HTML generated well
+
+``` shell
+# execution inside the container
+npm install --save-dev mocha chai chai-http sinon
+```
+
+I found some bug when I started to run the real tests later. Workaround
+is simple, just install the following packages as well.
+
+``` shell
+# execution inside the container
+npm install --save-dev combined-stream delayed-stream
+```
+
+``` shell
+# execute on the host
+mkdir frontend/test
+```
+
+Create a sanity test, create a file fronted/test/sanity.js
+
+``` javascript
+import assert from 'assert';
+describe('Array', function() {
+  describe('#indexOf()', function() {
+    it('should return -1 when the value is not present', function() {
+      assert.equal(-1, [1,2,3].indexOf(4));
+    });
+  });
+});
+```
+
+Finally extend our `package.json` to be able to execute the test.
+
+``` diff
+  "scripts": {
+    "start": "babel-node server/serve.js",
++     "test": "mocha --compilers js:babel-core/register"
+  },
+```
+
+``` shell
+# execution inside the container
+npm test
+```
+
+So far we didn't do any useful, so let's create a test against our page.
+
+Let's create a more useful test. Let's check whether the app is became
+available, so create a file in out test folder called `highLevelTest.js`.
+In this file we will write some high level assertion to make sure
+the HTML rendered well for each endpoint.
+We won't test much functionality just, some piece of expected content.
 
 
+``` javascript
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+
+import app from '../server/main';
+
+
+const expect = chai.expect;
+
+chai.use(chaiHttp);
+
+
+describe('App', function() {
+  describe('/', function() {
+    it('responds with status 200', function(done) {
+      chai.request(app)
+        .get('/')
+        .end(function(err, res) {
+          expect(res).to.have.status(200);
+          done();
+        });
+    });
+    it('response contains expected title', function(done) {
+      chai.request(app)
+        .get('/')
+        .end(function(err, res) {
+          expect(res.text).to.have.string('ADR database');
+          done();
+        });
+    });
+  });
+  describe('/submit', function() {
+    it('responds with status 200', function(done) {
+      chai.request(app)
+        .get('/submit.html')
+        .end(function(err, res) {
+          expect(res).to.have.status(200);
+          done();
+        });
+    });
+    it('response contains expected title', function(done) {
+      chai.request(app)
+        .get('/submit.html')
+        .end(function(err, res) {
+          expect(res.text).to.have.string('Create new decision record');
+          done();
+        });
+    });
+  });
+  describe('/view', function() {
+    it('responds with status 200', function(done) {
+      chai.request(app)
+        .get('/view.html')
+        .end(function(err, res) {
+          expect(res).to.have.status(200);
+          done();
+        });
+    });
+    it('response contains expected title', function(done) {
+      chai.request(app)
+        .get('/view.html')
+        .end(function(err, res) {
+          expect(res.text).to.have.string('Conclusion');
+          done();
+        });
+    });
+  });
+});
+```
+
+At this point we can remove out sanity test.
+
+## Improve our Dockerfile again, include tests in the build
+
+``` diff
+RUN npm install
+
+COPY . .
++
++ RUN npm test
+
+CMD ["npm", "run", "start"]
+```
 
 
 **FROM THIS POINT HAVE TO BE REORDERED**

@@ -661,3 +661,5 @@ Remainder, you can start that with the following command:
 # execute on the host
 docker-compose run --service-ports --rm tutorial-frontend
 ```
+
+You can check the [final code of this chapter](../phase-2-introduce-react/)

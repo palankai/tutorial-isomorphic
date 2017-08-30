@@ -1,0 +1,14 @@
+version: "3"
+services:
+  tutorial-frontend:
+    container_name: tutorial-frontend
+    image: tutorial-frontend
+    build:
+      context: frontend/
+    ports:
+      - "8080:8080"
+    volumes:
+      - "data:/usr/src/frontend/node_modules"
+      - "./frontend:/usr/src/frontend"
+volumes:
+  data:

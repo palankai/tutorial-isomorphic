@@ -565,8 +565,13 @@ is a very popular choice. Let's install that
 
 ``` bash
 # execute inside the container
-npm --save-dev install eslint-config-airbnb eslint-plugin-import eslint-plugin-jsx-a11y
+(
+  export PKG=eslint-config-airbnb;
+  npm info "$PKG@latest" peerDependencies --json | command sed 's/[\{\},]//g ; s/: /@/g' | xargs npm install --save-dev "$PKG@latest"
+)
 ```
+This command may looks very ugly but it makes sure you install all of the needed
+plugins as well.
 
 Let's extend our `package.json`:
 

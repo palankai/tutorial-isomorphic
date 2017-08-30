@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
+    "babel-preset-react": "^6.24.1",
     "chai": "^4.1.1",
     "chai-http": "^3.0.0",
     "combined-stream": "^1.0.5",
@@ -21,15 +22,16 @@
     "eslint": "^4.5.0",
     "eslint-config-airbnb": "^15.1.0",
     "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.3.0",
     "mocha": "^3.5.0",
     "sinon": "^3.2.1"
   },
   "scripts": {
     "start": "babel-node server/serve.js",
     "test": "mocha --compilers js:babel-core/register",
-    "lint": "eslint . --ext .js",
-    "lint:fix": "eslint . --ext .js --fix"
+    "lint": "eslint . --ext .js,.jsx",
+    "lint:fix": "eslint . --ext .js,.jsx --fix"
   },
   "eslintConfig": {
     "parser": "babel-eslint",
@@ -38,11 +40,12 @@
       "mocha": true
     },
     "extends": [
-      "airbnb-base"
+      "airbnb"
     ]
   },
   "babel": {
     "presets": [
+      "react",
       "env",
       "stage-0"
     ]

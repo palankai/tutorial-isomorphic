@@ -5,8 +5,6 @@ import { renderToString } from 'react-dom/server';
 import express from 'express';
 
 import Index from '../client/containers/Index';
-import View from '../client/containers/View';
-import Submit from '../client/containers/Submit';
 
 
 const app = express();
@@ -24,16 +22,12 @@ app.get('/', (req, res) => {
 
 
 app.get('/submit', (req, res) => {
-  res.render('Submit', {
-    Application: renderToString(<Submit />),
-  });
+  res.render('submit');
 });
 
 
 app.get('/view', (req, res) => {
-  res.render('View', {
-    Application: renderToString(<View />),
-  });
+  res.render('view');
 });
 
 app.use(express.static('public'));

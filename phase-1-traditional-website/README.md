@@ -295,6 +295,9 @@ docker-compose run --service-ports --rm tutorial-frontend
 
 ## Create a test to check whether our HTML generated well
 
+We are going to use [Mocha](https://mochajs.org/), [Chai](http://chaijs.com/) and
+[Sinon](http://sinonjs.org/).
+
 ``` shell
 # execution inside the container
 npm install --save-dev mocha chai chai-http sinon

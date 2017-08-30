@@ -9,56 +9,56 @@ const expect = chai.expect;
 chai.use(chaiHttp);
 
 
-describe('App', function() {
-  describe('/', function() {
-    it('responds with status 200', function(done) {
+describe('App', () => {
+  describe('/', () => {
+    it('responds with status 200', (done) => {
       chai.request(app)
         .get('/')
-        .end(function(err, res) {
+        .end((err, res) => {
           expect(res).to.have.status(200);
           done();
         });
     });
-    it('response contains expected title', function(done) {
+    it('response contains expected title', (done) => {
       chai.request(app)
         .get('/')
-        .end(function(err, res) {
+        .end((err, res) => {
           expect(res.text).to.have.string('ADR database');
           done();
         });
     });
   });
-  describe('/submit', function() {
-    it('responds with status 200', function(done) {
+  describe('/submit', () => {
+    it('responds with status 200', (done) => {
       chai.request(app)
         .get('/submit')
-        .end(function(err, res) {
+        .end((err, res) => {
           expect(res).to.have.status(200);
           done();
         });
     });
-    it('response contains expected title', function(done) {
+    it('response contains expected title', (done) => {
       chai.request(app)
         .get('/submit')
-        .end(function(err, res) {
+        .end((err, res) => {
           expect(res.text).to.have.string('Create new decision record');
           done();
         });
     });
   });
-  describe('/view', function() {
-    it('responds with status 200', function(done) {
+  describe('/view', () => {
+    it('responds with status 200', (done) => {
       chai.request(app)
         .get('/view')
-        .end(function(err, res) {
+        .end((err, res) => {
           expect(res).to.have.status(200);
           done();
         });
     });
-    it('response contains expected title', function(done) {
+    it('response contains expected title', (done) => {
       chai.request(app)
         .get('/view')
-        .end(function(err, res) {
+        .end((err, res) => {
           expect(res.text).to.have.string('Conclusion');
           done();
         });

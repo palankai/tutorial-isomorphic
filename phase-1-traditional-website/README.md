@@ -541,4 +541,123 @@ suffix. I'm not going to show that, however you will find them as a base
 in the folder of the next chapter.
 
 
+## lint
+
+The general purpose of check the code with [eslint](https://eslint.org/)
+is finding problematic code. Those issues may not cause problems directly,
+but could cause headaches later, better to avoid them.
+
+Let's install a few more packages:
+
+``` bash
+# execute inside the container
+npm install --save-dev eslint babel-eslint
+```
+
+Since we don't want to specify our own guidelines, we can choose
+an open source set of rules.
+The [Airbnb Style Guide](https://github.com/airbnb/javascript)
+is a very popular choice. Let's install that
+(ESLint configuration)[https://www.npmjs.com/package/eslint-config-airbnb].
+
+``` bash
+# execute inside the container
+npm --save-dev install eslint-config-airbnb eslint-plugin-import eslint-plugin-jsx-a11y
+```
+
+Let's extend our `package.json`:
+
+``` diff
+  "scripts": {
+    "start": "babel-node server/serve.js",
+-     "test": "mocha --compilers js:babel-core/register"
++     "test": "mocha --compilers js:babel-core/register",
++     "lint": "eslint . --ext .js",
++     "lint:fix": "eslint . --ext .js --fix"
+  },
++   "eslintConfig": {
++     "parser": "babel-eslint",
++     "rules": {},
++     "extends": [
++       "airbnb-base"
++     ]
++   },
+  "babel": {
+    "presets": [
+```
+
+If you execute the linter, it will find many errors.
+``` bash
+# execute inside the container
+npm run lint
+```
+
+We can fix some of them in the following way:
+
+``` bash
+# execute inside the container
+npm run lint:fix
+```
+
+I guess some of the failure like the following.
+
+```
+/usr/src/frontend/test/highLevelTest.js
+  12:1  error  'describe' is not defined  no-undef
+  13:3  error  'describe' is not defined  no-undef
+  14:5  error  'it' is not defined        no-undef
+  22:5  error  'it' is not defined        no-undef
+```
+
+However those statement are true, the code actually works fine, that's
+a false alarm. We can fix it, modify the linter configuration:
+
+``` diff
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "rules": {},
++     "env": {
++       "mocha": true
++     },
+    "extends": [
+      "airbnb-base"
+    ]
+  },
+```
+
+I think only one error remains. (If not, please fix the rest manually).
+
+```
+/usr/src/frontend/server/serve.js
+  4:3  warning  Unexpected console statement  no-console
+
+✖ 1 problem (0 errors, 1 warning)
+```
+
+We can fix that if we remove the console statement from our code,
+although we actually want to use that.
+
+We can simply disable that error, putting a comment in the code:
+
+
+``` diff
+app.listen(8080, () => {
++   // eslint-disable-next-line no-console
+  console.log('Example app listening on port 8080!');
+});
+```
+
+You may want to add the linter to your `Dockerfile`, but I found it very
+annoying. I recommend to execute that regularly, especially before commits
+and I strongly advise to execute it on the CI server.
+
+## Finally
+
 Well done. If you've reached this point, you have a solid base code.
+
+Remainder, you can start that with the following command:
+
+``` shell
+# execute on the host
+docker-compose run --service-ports --rm tutorial-frontend
+```

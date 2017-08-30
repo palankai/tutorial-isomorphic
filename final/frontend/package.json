@@ -11,16 +11,33 @@
     "express": "^4.15.4"
   },
   "devDependencies": {
+    "babel-eslint": "^7.2.3",
     "chai": "^4.1.1",
     "chai-http": "^3.0.0",
     "combined-stream": "^1.0.5",
     "delayed-stream": "^1.0.0",
+    "eslint": "^4.5.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
     "mocha": "^3.5.0",
     "sinon": "^3.2.1"
   },
   "scripts": {
     "start": "babel-node server/serve.js",
-    "test": "mocha --compilers js:babel-core/register"
+    "test": "mocha --compilers js:babel-core/register",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix"
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "rules": {},
+    "env": {
+      "mocha": true
+    },
+    "extends": [
+      "airbnb-base"
+    ]
   },
   "babel": {
     "presets": [

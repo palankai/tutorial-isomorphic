@@ -43,15 +43,23 @@ rich React Universal web application.
 In each folder of phases you will find the files which was created in the
 previous step. Use that folder as a working directory.
 
-### Phase 1 - Build a traditional website
+
+### [Phase 1 - Build a traditional website](phase-1-traditional-website/)
 
 In this tutorial we're going to build a traditional website using
 [Express](https://expressjs.com) (4.x) as a web application framework.
 We also use [EJS](http://www.embeddedjs.com) which is a very traditional
 template engine. Most importantly we introduce
-[Webpack](https://webpack.js.org) to transform our files to web application.
+[Babel](http://babeljs.io) to transform our files.
 
-If you're familiar with Webpack you can safely skip this phase.
+If you're familiar with Babel and Express you can safely skip this phase.
+
+
+### [Phase 2 - Using React](phase-2-introduce-react/)
+
+This chapter will show the basic usage of react and we make our application
+universal.
+
 
 ## Disclaimer
 

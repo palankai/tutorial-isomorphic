@@ -3,7 +3,7 @@ import Navigation from 'components/Navigation';
 
 const Submit = () => (
   <div>
-    <Navigation />
+    <Navigation active="submit" />
 
     <div className="container">
       <div className="row">

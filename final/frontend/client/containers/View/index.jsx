@@ -4,7 +4,7 @@ import Navigation from 'components/Navigation';
 
 const View = () => (
   <div>
-    <Navigation />
+    <Navigation active="view" />
 
     <div className="container">
       <div className="row">

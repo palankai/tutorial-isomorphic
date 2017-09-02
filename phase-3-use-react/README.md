@@ -3,6 +3,9 @@
 In this short chapter we are going to play with our components.
 Explore different use cases.
 
+*This point I've realised I made some mistake, however I'm going to refactor
+instead of fixing them in the previous chapters.*
+
 ## Recap
 
 Build the docker image
@@ -195,3 +198,144 @@ export default Navigation;
 
 I admit this isn't the nicest code ever, but let's leave it a bit.
 
+
+## Use child components
+
+As I mentioned on the top of this chapter, I made a small mistake. We
+created a Sidebar component however that is really just an Archive component.
+
+I believe this kind of mistakes part of the building and the refactoring
+process. So let's see how can we fix it.
+
+### Fix my mistake
+
+First, rename the folders
+
+``` shell
+# execute on the host
+mv frontend/client/components/Sidebar/ frontend/client/components/ArchiveModule
+```
+
+Fix the references in our Index and View container components:
+
+``` diff
+- import Sidebar from 'components/Sidebar;
++ import ArchiveModule from 'components/ArchiveModule';
+```
+
+``` diff
+<aside className="col-sm-3 col-sm-offset-1">
+-   <Sidebar />
++   <ArchiveModule />
+</aside>
+```
+
+Please try our application before you go any further. Your instinct may
+tells you that won't work, since we haven't renamed our components,
+but the statement `import Something from 'componets/Something';` works
+a bit differently than you expect. The word after the `import` works as an
+alias, it could be anything, doesn't have to much to the name in the package.
+Although, I'm going to fix that.
+
+Fix `frontend/client/components/ArchiveModule/index.jsx`
+``` diff
+import React from 'react';
+
+- const Sidebar = () => (
++ const ArchiveModule = () => (
+  <div className="sidebar-module">
+    <h4>Archives</h4>
+    <ol className="list-unstyled">
+      <li><a href="/?byDate=2017-03">March 2017</a></li>
+      <li><a href="/?byDate=2017-02">February 2017</a></li>
+      <li><a href="/?byDate=2017-01">January 2017</a></li>
+    </ol>
+  </div>
+);
+
+- export default Sidebar;
++ export default ArchiveModule;
+```
+
+## Create and AboutModule component
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/AboutModule
+```
+
+Just as we did before, create a file inside this folder, called `index.jsx`.
+
+``` jsx
+import React from 'react';
+
+const AboutModule = () => (
+  <div className="sidebar-module sidebar-module-inset">
+    <h4>What is ADR</h4>
+    <p>An architectural decision record (ADR) is a way to track an AD, such as by writing notes, or logging information.</p>
+    <p>
+      <a href="https://github.com/joelparkerhenderson/architecture_decision_record"
+        target="_blank">Read more...</a>
+      </p>
+  </div>
+);
+
+export default AboutModule;
+```
+
+## Introduce the real Sidebar component
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/Sidebar
+```
+
+But in this point we won't simply create a new component as we did
+before and use nested components. So first let see how should we modify
+our Index and View components.
+
+``` jsx
+  import ExcerptList from 'components/ExcerptList';
++ import Sidebar from 'components/Sidebar';
+  import ArchiveModule from 'components/ArchiveModule';
+```
+
+``` jsx
+- <aside className="col-sm-3 col-sm-offset-1">
+-   <ArchiveModule />
+- </aside>
++ <div className="col-sm-3 col-sm-offset-1">
++   <Sidebar>
++     <AboutModule />
++     <ArchiveModule />
++   </Sidebar>
++ </div>
+```
+
+Just as we did before, create a file called `index.jsx` for our Sidebar.
+As we learned earlier, we can use parameters of the component. There is a
+special parameter called `children` which contains our nested elements.
+
+``` jsx
+import React from 'react';
+
+const AboutModule = () => (
+  <div className="sidebar-module sidebar-module-inset">
+    <h4>What is ADR</h4>
+    <p>An architectural decision record (ADR) is a way to track an AD, such as by writing notes, or logging information.</p>
+    <p>
+      <a href="https://github.com/joelparkerhenderson/architecture_decision_record"
+        target="_blank">Read more...</a>
+      </p>
+  </div>
+);
+
+export default AboutModule;
+```
+
+
+## Fix our Excerpt module as well
+
+I was really under the impression making Excerpt sub-component of Excerpt list
+is a good idea, however I think, we can use our components more flexible
+if we undo that modification.

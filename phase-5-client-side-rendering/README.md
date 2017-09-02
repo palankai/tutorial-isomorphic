@@ -41,3 +41,12 @@ Check coding guidelines
 # execute inside the container
 npm run lint
 ```
+
+## What is this topic about
+
+So far we render every component on the server side responding to the request.
+This is the traditional way to build an application. This is essential
+if we want to be visible for search engines. But it has a downside as well.
+Our users have to download the whole page every time when they visit any
+of our pages, even if just the small part of the page get changed.
+With client side rendering we can provide smooth experience to our users.

@@ -624,11 +624,269 @@ Notice, we use relative import as it is a nested component.
 </footer>
 ```
 
-You might see logically in this point we can extract the list of excerpt as
-well.
+### Extract the Toolbar
+
+This is the component on the top and the bottom of ADR view
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/Toolbar
+```
+
+Create a file inside this folder, called `index.jsx`.
+
+``` jsx
+import React from 'react';
+
+const Toolbar = () => (
+  <div className="well well-sm clearfix">
+    <a href="/submit" className="btn btn-primary btn-xs pull-right"><span className="glyphicon glyphicon-remove"></span> Edit</a>
+    <a href="/" className="btn btn-success btn-xs"><span className="glyphicon glyphicon-ok"></span> Approve</a>
+    <a href="/" className="btn btn-danger btn-xs"><span className="glyphicon glyphicon-pencil"></span> Reject</a>
+  </div>
+);
+
+export default Toolbar;
+```
+
+Replace it in our View container
+
+``` diff
++ import Navigation from 'components/Toolbar;
+```
+
+Top of the View container component
+
+``` diff
+<div className="col-sm-8">
++   <Toolbar />
+  <article className="Adr">
+-     <div className="well well-sm clearfix">
+-       <a href="/submit" className="btn btn-primary btn-xs pull-right"><span className="glyphicon glyphicon-remove"></span> Edit</a>
+-       <a href="/" className="btn btn-success btn-xs"><span className="glyphicon glyphicon-ok"></span> Approve</a>
+-       <a href="/" className="btn btn-danger btn-xs"><span className="glyphicon glyphicon-pencil"></span> Reject</a>
+-     </div>
+    <header>
+```
+Please note, the toolbar was originally in a wrong place on the top...
+
+Bottom of the View container component
+``` diff
+    </section>
+  </article>
+-     <div className="well well-sm clearfix">
+-         <a href="/submit" className="btn btn-primary btn-xs pull-right"><span className="glyphicon glyphicon-remove"></span> Edit</a>
+-         <a href="/" className="btn btn-success btn-xs"><span className="glyphicon glyphicon-ok"></span> Approve</a>
+-         <a href="/" className="btn btn-danger btn-xs"><span className="glyphicon glyphicon-pencil"></span> Reject</a>
+-     </div>
++   <Toolbar />
+</div>
+
+<aside className="col-sm-3 col-sm-offset-1">
+```
+
+### Extract the ADR
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/ADR
+```
+
+Create a file inside this folder, called `index.jsx`.
+
+``` jsx
+import React from 'react';
+
+const ADR = () => (
+  <article className="Adr">
+    <header>
+      <h1 className="Adr-title">Sample decision</h1>
+      <p className="Adr-meta"><span>ADR-0001</span> January 1, 2014 by <a href="#">Mark</a> </p>
+    </header>
+    <section>
+        <h2>Excerpt</h2>
+        <p>Cum sociis natoque penatibus et magnis nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+    </section>
+    <section>
+        <h2>Context</h2>
+        <p>Cum sociis natoque penatibus et magnis nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+        <p>Cum sociis natoque penatibus et magnis nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+        <p>Cum sociis natoque penatibus et magnis nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+        <p>Cum sociis natoque penatibus et magnis nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+        <p>Cum sociis natoque penatibus et magnis nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+    </section>
+    <section>
+        <h2>Conclusion</h2>
+        <p>Cum sociis natoque penatibus et magnis nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+    </section>
+  </article>
+);
+
+export default ADR;
+```
+
+Replace it in our View container
+
+``` diff
++ import Navigation from 'components/ADR;
+```
+
+Then our view container should look like this:
+
+``` jsx
+import React from 'react';
+
+import ADR from 'components/ADR';
+import Sidebar from 'components/Sidebar';
+import Navigation from 'components/Navigation';
+import Toolbar from 'components/Toolbar';
 
 
-#### Explore component possibilities
+const View = () => (
+  <div>
+    <Navigation active="view" />
+    <div className="container">
+      <div className="row">
+        <div className="col-sm-8">
+          <Toolbar />
+          <ADR />
+          <Toolbar />
+        </div>
+        <aside className="col-sm-3 col-sm-offset-1">
+          <Sidebar />
+        </aside>
+      </div>
+    </div>
+  </div>
+);
+
+export default View;
+```
+
+Just as our index it's also looks much better.
+
+
+### Extract the ADR Editor
+
+We are going to extract the ADR editor, but we won't break it down now.
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/Editor
+```
+
+Create a file inside this folder, called `index.jsx`.
+
+``` jsx
+import React from 'react';
+
+const Editor = () => (
+  <div>
+    <h1>Create new decision record</h1>
+    <form action="/view">
+      <div className="well form-horizontal">
+      ...
+      </div>
+    </form>
+  <div />
+);
+
+export default Editor;
+```
+
+Replace it in our Submit container
+
+``` diff
++ import Navigation from 'components/Editor';
+```
+
+Then our view container should look like this:
+
+``` jsx
+import React from 'react';
+
+import Navigation from 'components/Navigation';
+import Editor from 'components/Editor';
+
+const Submit = () => (
+  <div>
+    <Navigation active="submit" />
+    <div className="container">
+      <div className="row">
+        <div className="col-sm-12">
+          <Editor />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+export default Submit;
+```
+
+### Where we are
+
+Now we have a more or less well structured component hierarchy, our
+components are small enough, we don't have redundant component.
+
+Your folder structure at this point should look like this:
+
+```
+├── docker-compose.yml
+└── frontend
+    ├── Dockerfile
+    ├── client
+    │   ├── components
+    │   │   ├── ADR
+    │   │   │   └── index.jsx
+    │   │   ├── Editor
+    │   │   │   └── index.jsx
+    │   │   ├── ExcerptList
+    │   │   │   ├── Excerpt
+    │   │   │   │   └── index.jsx
+    │   │   │   └── index.jsx
+    │   │   ├── Navigation
+    │   │   │   └── index.jsx
+    │   │   ├── Pager
+    │   │   │   └── index.jsx
+    │   │   ├── Sidebar
+    │   │   │   └── index.jsx
+    │   │   └── Toolbar
+    │   │       └── index.jsx
+    │   └── containers
+    │       ├── Index
+    │       │   └── index.jsx
+    │       ├── Submit
+    │       │   └── index.jsx
+    │       └── View
+    │           └── index.jsx
+    ├── node_modules
+    ├── package-lock.json
+    ├── package.json
+    ├── public
+    │   └── static
+    │       ├── css
+    │       │   ├── bootstrap.spacelab.min.css
+    │       │   └── styles.css
+    │       └── fonts
+    │           ├── glyphicons-halflings-regular.eot
+    │           ├── glyphicons-halflings-regular.svg
+    │           ├── glyphicons-halflings-regular.ttf
+    │           ├── glyphicons-halflings-regular.woff
+    │           └── glyphicons-halflings-regular.woff2
+    ├── server
+    │   ├── main.jsx
+    │   ├── serve.js
+    │   └── templates
+    │       ├── index.ejs
+    │       ├── submit.ejs
+    │       └── view.ejs
+    └── test
+        └── highLevelTest.js
+```
+
+
+## Explore component possibilities
 
 If you tried this navigation now, it would work well, but you can spot an
 issue. The active menu item constantly the Home. We will fix that later in

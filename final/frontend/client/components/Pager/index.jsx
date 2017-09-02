@@ -9,7 +9,7 @@ const Pager = () => (
       <li><a href="/?page=3">3</a></li>
       <li><a href="/?page=4">4</a></li>
       <li><a href="/?page=5">5</a></li>
-      <li><a href="/?page=2" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+      <li><a href="/?page=2" aria-label="Next"><span>&raquo;</span></a></li>
     </ul>
   </nav>
 );

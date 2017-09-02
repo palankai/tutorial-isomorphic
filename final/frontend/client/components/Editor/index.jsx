@@ -35,33 +35,33 @@ const Editor = () => (
           <div className="form-group">
             <label htmlFor="excerpt" className="control-label">Excerpt</label>
             <div>
-              <textarea className="form-control" rows="3" id="excerpt"></textarea>
+              <textarea className="form-control" rows="3" id="excerpt" />
               <span className="help-block">Brief description about the ADR</span>
             </div>
           </div>
           <div className="form-group">
             <label htmlFor="context" className="control-label">Context</label>
             <div>
-              <textarea className="form-control" rows="12" id="context"></textarea>
+              <textarea className="form-control" rows="12" id="context" />
               <span className="help-block">Background information about the decision</span>
             </div>
           </div>
           <div className="form-group">
             <label htmlFor="conclusion" className="control-label">Conclusion</label>
             <div>
-              <textarea className="form-control" rows="6" id="conclusion"></textarea>
+              <textarea className="form-control" rows="6" id="conclusion" />
             </div>
           </div>
         </fieldset>
       </div>
       <div className="well">
         <div>
-          <a href="/" className="btn btn-danger"><span className="glyphicon glyphicon-remove"></span> Cancel</a>
-          <button type="submit" className="btn btn-primary"><span className="glyphicon glyphicon-ok"></span> Submit</button>
+          <a href="/" className="btn btn-danger"><span className="glyphicon glyphicon-remove" /> Cancel</a>
+          <button type="submit" className="btn btn-primary"><span className="glyphicon glyphicon-ok" /> Submit</button>
         </div>
       </div>
     </form>
-  </ div>
+  </div>
 );
 
 export default Editor;

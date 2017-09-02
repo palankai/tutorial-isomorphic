@@ -335,3 +335,201 @@ export default AboutModule;
 
 This modification may seem pointless, honestly it is, but I wanted to show
 how we can use child components. We will rely on this knowledge.
+
+
+## Fix eslint errors
+
+We've skip checking the eslint errors. If you check now, you probably
+find terrifying the list of issues we have. Let's go through the problems
+and fix them.
+
+### Import issue
+
+We've introduced babel module-resolver plugin earlier, but eslint doesn't
+know anything about it. Let's fix that first.
+Install an eslint plugin called
+[eslint-import-resolver-babel-module](https://github.com/tleunen/eslint-import-resolver-babel-module)
+
+``` shell
+# execute inside the container
+npm install --save-dev eslint-plugin-import eslint-import-resolver-babel-module
+```
+
+Modify our eslint configuration inside `package.json`:
+
+``` diff
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "rules": {},
+    "env": {
+      "mocha": true
+    },
+    "extends": [
+      "airbnb"
+-     ]
++     ],
++     "settings": {
++       "import/resolver": {
++         "babel-module": {}
++       }
++     }
+  },
+```
+
+
+### prop-types issue
+
+You will find an error like this:
+``` diff
+/usr/src/frontend/client/components/Sidebar/index.jsx
+  3:20  error  'children' is missing in props validation  react/prop-types
+```
+
+Although our components (which have any parameter) works well, we should
+list the used properties.
+
+For further reference please check the
+[related React documentation](https://facebook.github.io/react/docs/typechecking-with-proptypes.html)
+
+Install [prop-types](https://github.com/facebook/prop-types) package:
+
+``` shell
+# execute inside the container
+npm install --save prop-types
+```
+
+Modify our Sidebar component:
+
+``` diff
+  import React from 'react';
++ import PropTypes from 'prop-types';
+
+  const Sidebar = ({ children }) => (
+    <aside>
+      {children}
+    </aside>
+  );
+
++ Sidebar.propTypes = {
++   children: PropTypes.arrayOf(PropTypes.Element).isRequired
++ };
+
+  export default Sidebar;
+```
+
+Let's fix our navigation component in the similar fashion:
+
+``` diff
+  import React from 'react';
++ import PropTypes from 'prop-types';
+
+  const Navigation = ({ active }) => (
+    <nav className="navbar navbar-inverse navbar-static-top">
+    ...
+    </nav>
+  );
+
++ Navigation.propTypes = {
++   active: PropTypes.String
++ };
+
++ Navigation.defaultProps = {
++   active: ''
++ };
+
+  export default Navigation;
+```
+
+### Coma dongle issue
+
+I don't like to have coma in the end of the last element of a list in
+javascript. Actually my editor complains as well. I can modify my
+editor or we can fix it with eslint.
+
+``` diff
+    "eslintConfig": {
+      "parser": "babel-eslint",
+-     "rules": {}
++     "rules": {
++       "comma-dangle": 0
++     },
+      "env": {
+        "mocha": true
+      },
+      "extends": [
+        "airbnb"
+      ],
+      "settings": {
+        "import/resolver": {
+          "babel-module": {}
+        }
+      }
+    },
+```
+
+### Line too long issue
+
+We are working with HTML and in some cases we put long static contents.
+We can fix those lines, but in this stage I rather extend our guideline.
+
+Modify the eslint configuration again in `package.json`:
+
+``` diff
+  "rules": {
+-   "comma-dangle": 0
++   "comma-dangle": 0,
++   "max-len": 0
+  },
+```
+
+For now, I suppress that error, however it might be not a good idea.
+Feel free to skip this fix.
+If you leave it (as I do), it reminds us to fix that later.
+
+### Accessibility issues
+
+This issues may doesn't look very important, but I think in the context
+of the modern web application we should take care of them as well.
+The eslint Airbnb plugin has already check them.
+
+**Be aware this kind of static checking doesn't cover your application well,
+we will introduce later an other tool as well which checks our run time
+application**
+
+You might want to read more about [A11Y project](http://a11yproject.com/).
+
+```
+/usr/src/frontend/client/components/Pager/index.jsx
+  12:11  error  Anchors must have content and the content must be accessible by a screen reader  jsx-a11y/anchor-has-content
+```
+
+I have to admit I struggled a bit when I tried to solve this issue,
+I'm not even 100 percent sure about the solution, but it works apparently:
+
+In our Pager component, do the following modification:
+
+``` diff
+    <li><a href="/?page=5">5</a></li>
+-   <li><a href="/?page=2" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
++   <li><a href="/?page=2" aria-label="Next"><span>&raquo;</span></a></li>
+  </ul>
+```
+
+### Issues with hash
+
+``` diff
+/usr/src/frontend/client/components/ExcerptList/Excerpt/index.jsx
+  7:104  error  Links must not point to "#". Use a more descriptive href or use a button instead  jsx-a11y/href-no-hash
+```
+
+If you see error like this, that's a valid case. I want to keep it as a
+reminder, since in our production code should not have links with `#`.
+
+
+As we decided in some cases, we don't solve all of the issues now.
+You might not have more than two types of issue, though.
+
+Having some lint issue can be natural, especially in the middle of the
+refactoring phase. You can fix them all, but I warn you against checking
+the code meanwhile the docker build. Although execute them part of your
+CI pipeline could be beneficial.

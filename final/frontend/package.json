@@ -9,6 +9,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "ejs": "^2.5.7",
     "express": "^4.15.4",
+    "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
   },
@@ -22,6 +23,7 @@
     "delayed-stream": "^1.0.0",
     "eslint": "^4.5.0",
     "eslint-config-airbnb": "^15.1.0",
+    "eslint-import-resolver-babel-module": "^3.0.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.3.0",
@@ -36,13 +38,20 @@
   },
   "eslintConfig": {
     "parser": "babel-eslint",
-    "rules": {},
+    "rules": {
+      "comma-dangle": 0
+    },
     "env": {
       "mocha": true
     },
     "extends": [
       "airbnb"
-    ]
+    ],
+    "settings": {
+      "import/resolver": {
+        "babel-module": {}
+      }
+    }
   },
   "babel": {
     "presets": [
@@ -51,13 +60,18 @@
       "stage-0"
     ],
     "plugins": [
-      ["module-resolver", {
-        "root": ["./"],
-        "alias": {
-          "components": "./client/components",
-          "containers": "./client/containers"
+      [
+        "module-resolver",
+        {
+          "root": [
+            "./"
+          ],
+          "alias": {
+            "components": "./client/components",
+            "containers": "./client/containers"
+          }
         }
-      }]
+      ]
     ]
   },
   "keywords": [],

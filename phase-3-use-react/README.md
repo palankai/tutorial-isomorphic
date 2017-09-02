@@ -333,9 +333,5 @@ const AboutModule = () => (
 export default AboutModule;
 ```
 
-
-## Fix our Excerpt module as well
-
-I was really under the impression making Excerpt sub-component of Excerpt list
-is a good idea, however I think, we can use our components more flexible
-if we undo that modification.
+This modification may seem pointless, honestly it is, but I wanted to show
+how we can use child components. We will rely on this knowledge.

@@ -168,7 +168,7 @@ Install [Babel React preset](https://babeljs.io/docs/plugins/preset-react/)
 
 ``` shell
 # execute inside the container
-npm install --save-dev babel-preset-react
+npm install --save babel-preset-react
 ```
 
 Modify babel configuration in `package.json`:
@@ -300,3 +300,108 @@ We will continue the work, based on the assumption those components are
 created.
 
 You should finally execute the tests, which should pass.
+
+
+## Extract components
+
+In this section we're going to extract components, break down our three pages.
+
+### Solve import with babel
+
+We are going to create small components, and we will use them inside each
+other. In many cases the relative import works best but it could make
+the refactoring very difficult as well.
+
+In the following sections we will create components like `Navigation`
+and we have to import them. The header of our container components would
+look like this:
+
+``` diff
+import React from 'react';
++ import Navigation from '../../components/Navigation';
+```
+
+If you look closer, you will see, we have to navigate 2 folders up first.
+However we are build a container component directly inside the container
+folder. It still make sense, since we've decided to use folder based
+components (folder, and an index.jsx inside - I made up this name).
+But it's implementation details, makes any refactoring harder.
+
+I prefer the import like this:
+
+``` diff
+import React from 'react';
+- import Navigation from '../../components/Navigation';
++ import Navigation from 'components/Navigation';
+```
+
+In order to do that we have to install a babel plugin called
+[Module Resolver](https://github.com/tleunen/babel-plugin-module-resolver),
+this will help us to maintain our packages easier.
+
+(This issue can be solved with many other ways)
+
+``` shell
+# execute inside the container
+npm install --save babel-plugin-module-resolver
+```
+
+Modify our `package.json` to use this plugin.
+``` diff
+  "babel": {
+    "presets": [
+      "react",
+      "env",
+      "stage-0"
+-     ]
++     ],
++     "plugins": [
++       ["module-resolver", {
++         "root": ["./"],
++         "alias": {
++           "components": "./client/components",
++           "containers": "./client/containers"
++         }
++       }]
++     ]
+  },
+```
+
+### Extract navigation
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/Navigation
+```
+
+Create a file inside this folder, called `index.jsx`.
+
+``` jsx
+import React from 'react';
+
+const Navigation = () => (
+  <nav className="navbar navbar-inverse navbar-static-top">
+  ...
+  </nav>
+);
+
+export default Navigation;
+```
+
+Finally modify each container components to use the `Navigation` component,
+instead of having redundant piece of code everywhere.
+
+``` diff
+import React from 'react';
++ import Navigation from 'components/Navigation';
+
+const Index = () => (
+  <div>
+
+-     <nav className="navbar navbar-inverse navbar-static-top">
+-     ...
+-     </nav>
++     <Navigation />
+
+    <div className="container">
+```

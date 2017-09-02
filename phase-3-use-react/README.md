@@ -386,7 +386,9 @@ You will find an error like this:
 ```
 
 Although our components (which have any parameter) works well, we should
-list the used properties.
+list the used properties. One of the really good benefit of having this kind
+of type checking, our test would complain as well if the property is
+missing or the type is invalid.
 
 For further reference please check the
 [related React documentation](https://facebook.github.io/react/docs/typechecking-with-proptypes.html)

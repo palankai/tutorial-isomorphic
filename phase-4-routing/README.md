@@ -55,3 +55,7 @@ files.
 ## Install React Router
 
 
+``` shell
+# execute inside the container
+npm run lint
+```

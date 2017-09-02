@@ -42,11 +42,11 @@ const Navigation = ({ active }) => (
 );
 
 Navigation.propTypes = {
-  active: PropTypes.String
+  active: PropTypes.string
 };
 
 Navigation.defaultProps = {
-  active: ''
+  active: 'Stranger'
 };
 
 export default Navigation;

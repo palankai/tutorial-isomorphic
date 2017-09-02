@@ -411,7 +411,7 @@ Modify our Sidebar component:
   );
 
 + Sidebar.propTypes = {
-+   children: PropTypes.arrayOf(PropTypes.Element).isRequired
++   children: PropTypes.arrayOf(PropTypes.element).isRequired
 + };
 
   export default Sidebar;
@@ -430,7 +430,7 @@ Let's fix our navigation component in the similar fashion:
   );
 
 + Navigation.propTypes = {
-+   active: PropTypes.String
++   active: PropTypes.string
 + };
 
 + Navigation.defaultProps = {

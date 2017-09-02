@@ -5,6 +5,9 @@ URLs, we will use [React-Router](https://reacttraining.com/react-router/).
 
 This step is an important preparation towards client side rendering.
 
+Be aware we are still talking about server side routing, but
+with React Router we will be able to do client side routing as well.
+
 ## Recap
 
 Build the docker image
@@ -42,3 +45,13 @@ Check coding guidelines
 # execute inside the container
 npm run lint
 ```
+
+## What we are going to achieve in this chapter
+
+We are going to refactor our `main.jsx` to have only one entry point,
+which should handle all of our routing questions. We also unite our 3 template
+files.
+
+## Install React Router
+
+

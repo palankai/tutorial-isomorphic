@@ -14,12 +14,6 @@ First we recreate the main page components and through multiple steps we
 are going to create many small components to have server rendered
 React web application.
 
-We will have to fix the routing as we want React to control the different
-URLs, we will use [React-Router](https://reacttraining.com/react-router/).
-
-And finally we will make the application rendered well both server and client
-side.
-
 ## Recap
 
 At this point we have a server generated website, using

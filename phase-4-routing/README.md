@@ -52,10 +52,16 @@ We are going to refactor our `main.jsx` to have only one entry point,
 which should handle all of our routing questions. We also unite our 3 template
 files.
 
-## Install React Router
+## Getting started with React Router
 
+### Install the necessary packages
 
 ``` shell
 # execute inside the container
-npm run lint
+npm install --save react-router react-router-dom react-router-config
 ```
+
+Before we go any further, please execute our tests, make sure every test
+pass.
+
+

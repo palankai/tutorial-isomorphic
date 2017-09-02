@@ -406,6 +406,228 @@ const Index = () => (
     <div className="container">
 ```
 
+### Extract Sidebar
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/Sidebar
+```
+
+Create a file inside this folder, called `index.jsx`.
+
+``` jsx
+import React from 'react';
+
+const Sidebar = () => (
+  <div className="sidebar-module">
+    <h4>Archives</h4>
+    <ol className="list-unstyled">
+      <li><a href="/?byDate=2017-03">March 2017</a></li>
+      <li><a href="/?byDate=2017-02">February 2017</a></li>
+      <li><a href="/?byDate=2017-01">January 2017</a></li>
+    </ol>
+  </div>
+);
+
+export default Sidebar;
+```
+
+Replace all redundant sidebar elements in every container component
+
+``` diff
+import React from 'react';
++ import Navigation from 'components/Sidebar;
+```
+
+``` diff
+<aside className="col-sm-3 col-sm-offset-1">
+-   <div className="sidebar-module">
+-   ...
+-   </div>
++   <Sidebar />
+</aside>
+```
+
+### Extract Pager
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/Pager
+```
+
+Create a file inside this folder, called `index.jsx`.
+
+``` jsx
+import React from 'react';
+
+const Pager = () => (
+  <nav aria-label="Page navigation">
+    <ul className="pagination pagination-lg">
+      <li className="disabled"><span aria-hidden="true">&laquo;</span></li>
+      <li className="active"><span>1</span></li>
+      <li><a href="/?page=2">2</a></li>
+      <li><a href="/?page=3">3</a></li>
+      <li><a href="/?page=4">4</a></li>
+      <li><a href="/?page=5">5</a></li>
+      <li><a href="/?page=2" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+    </ul>
+  </nav>
+);
+
+export default Pager;
+```
+
+Replace Pager in our Index container
+
+``` diff
++ import Navigation from 'components/Pager;
+```
+
+``` diff
+<footer>
+-   <nav aria-label="Page navigation">
+-   ...
+-   </nav>
++  <Pager />
+</footer>
+```
+
+### Extract the list of Excerpt
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/ExcerptList
+```
+
+Create a file inside this folder, called `index.jsx`.
+
+``` jsx
+import React from 'react';
+
+import Pager from 'components/Pager';
+
+const ExcerptList = () => (
+  <div>
+    <div className="app-header">
+      <h1 className="app-title">ADR database</h1>
+      <p className="lead app-description">Architectural Decision Records keep track of decisions which ever made</p>
+    </div>
+    <article className="Adr">
+      <header>
+        <h2 className="Adr-title"><a href="/view">Sample decision</a></h2>
+        <p className="Adr-meta"><a className="app-adr-code" href="/view">ADR-0001</a> January 1, 2014 by <a href="#">Mark</a></p>
+      </header>
+      <section>
+        <p>Cum sociis natoque penatibus et magnis nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+      </section>
+      <footer>
+        <a href="/view">Read more</a>
+      </footer>
+    </article>
+    <footer>
+      <Pager />
+    </footer>
+  </div>
+);
+
+export default ExcerptList;
+```
+
+Replace it in our Index container
+
+``` diff
++ import Navigation from 'components/ExcerptList;
+```
+
+At this point our Index container should look like this:
+
+``` jsx
+import React from 'react';
+import ExcerptList from 'components/ExcerptList';
+import Sidebar from 'components/Sidebar';
+import Navigation from 'components/Navigation';
+
+const Index = () => (
+  <div>
+    <Navigation active="home" />
+    <div className="container">
+      <div className="row">
+        <div className="col-sm-8">
+          <ExcerptList />
+        </div>
+        <aside className="col-sm-3 col-sm-offset-1">
+          <Sidebar />
+        </aside>
+      </div>
+    </div>
+  </div>
+);
+
+export default Index;
+```
+
+I think it's pretty neat. Simple it basically just a layout around
+our components.
+
+### Extract ADR excerpt
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/ExcerptList/Excerpt
+```
+It will become a nested component, since the list of Excerpt is the only
+place where we want to use it.
+(Again, you can argue whether this is better or worse)
+
+Create a file inside this folder, called `index.jsx`.
+
+``` jsx
+import React from 'react';
+
+const Excerpt = () => (
+  <article className="Adr">
+    <header>
+      <h2 className="Adr-title"><a href="/view">Sample decision</a></h2>
+      <p className="Adr-meta"><a className="app-adr-code" href="/view">ADR-0001</a> January 1, 2014 by <a href="#">Mark</a></p>
+    </header>
+    <section>
+        <p>Cum sociis natoque penatibus et magnis nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+    </section>
+    <footer>
+      <a href="/view">Read more</a>
+    </footer>
+  </article>
+);
+
+export default Excerpt;
+```
+
+Replace it in our ExcerptList container
+
+``` diff
++ import Navigation from './Excerpt;
+```
+
+Notice, we use relative import as it is a nested component.
+
+``` diff
+<div className="app-header">
+  <h1 className="app-title">ADR database</h1>
+  <p className="lead app-description">Architectural Decision Records keep track of decisions which ever made</p>
+</div>
+- <article className="Adr">
+- ...
+- </article>
++ <Excerpt />
+<footer>
+<Pager />
+</footer>
+```
+
+You might see logically in this point we can extract the list of excerpt as
+well.
+
+
 #### Explore component possibilities
 
 If you tried this navigation now, it would work well, but you can spot an
@@ -559,3 +781,4 @@ export default Navigation;
 ```
 
 I admit this isn't the nicest code ever, but let's leave it a bit.
+

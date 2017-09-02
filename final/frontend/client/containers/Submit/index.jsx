@@ -5,7 +5,7 @@ import Editor from 'components/Editor';
 
 const Submit = () => (
   <div>
-    <Navigation active="submit" />
+    <Navigation />
     <div className="container">
       <div className="row">
         <div className="col-sm-12">

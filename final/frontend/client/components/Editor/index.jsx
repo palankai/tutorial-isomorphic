@@ -61,7 +61,7 @@ const Editor = () => (
         </div>
       </div>
     </form>
-  <div />
+  </ div>
 );
 
 export default Editor;

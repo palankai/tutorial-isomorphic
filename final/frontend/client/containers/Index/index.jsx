@@ -6,7 +6,7 @@ import Navigation from 'components/Navigation';
 
 const Index = () => (
   <div>
-    <Navigation active="home" />
+    <Navigation />
     <div className="container">
       <div className="row">
         <div className="col-sm-8">

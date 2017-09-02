@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Navigation = ({ active }) => (
+const Navigation = () => (
   <nav className="navbar navbar-inverse navbar-static-top">
     <div className="container">
       <div className="navbar-header">
@@ -14,16 +14,8 @@ const Navigation = ({ active }) => (
       </div>
       <div id="navbar" className="navbar-collapse collapse">
         <ul className="nav navbar-nav">
-          {active === 'home' ?
           <li className="active"><a href="/">Home</a></li>
-            :
-          <li ><a href="/">Home</a></li>
-          }
-          {active === 'submit' ?
-          <li className="active"><a href="/submit">Submit</a></li>
-            :
           <li><a href="/submit">Submit</a></li>
-          }
         </ul>
         <form className="navbar-form navbar-right" action="index">
           <div className="input-group">

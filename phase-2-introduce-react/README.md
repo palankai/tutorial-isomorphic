@@ -549,7 +549,7 @@ import Navigation from 'components/Navigation';
 
 const Index = () => (
   <div>
-    <Navigation active="home" />
+    <Navigation />
     <div className="container">
       <div className="row">
         <div className="col-sm-8">
@@ -744,7 +744,7 @@ import Toolbar from 'components/Toolbar';
 
 const View = () => (
   <div>
-    <Navigation active="view" />
+    <Navigation />
     <div className="container">
       <div className="row">
         <div className="col-sm-8">
@@ -810,7 +810,7 @@ import Editor from 'components/Editor';
 
 const Submit = () => (
   <div>
-    <Navigation active="submit" />
+    <Navigation />
     <div className="container">
       <div className="row">
         <div className="col-sm-12">

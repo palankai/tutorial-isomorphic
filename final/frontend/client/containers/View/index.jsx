@@ -8,7 +8,7 @@ import Toolbar from 'components/Toolbar';
 
 const View = () => (
   <div>
-    <Navigation />
+    <Navigation active="view" />
     <div className="container">
       <div className="row">
         <div className="col-sm-8">

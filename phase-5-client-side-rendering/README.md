@@ -454,6 +454,10 @@ As you can see on the Network tab of the developer toolbar, we load
 the bundle with the hash. So whenever we modify and rebuild our application
 our users will see the latest code.
 
+However this topic is about how to speed up our development, but
+sometimes some external tool can be handy as well, so please check
+[React developer tools](https://github.com/facebook/react-devtools) out.
+
 ## Development tools
 
 Developing our application is a very painful operation now. Every time when
@@ -696,5 +700,3 @@ we can start the container directly. This basically a production like start:
 # execute on the host
 docker run --rm -ti -p 8080:8080 tutorial-frontend
 ```
-
-### Browser dev tools

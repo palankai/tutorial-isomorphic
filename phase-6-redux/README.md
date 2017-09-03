@@ -142,3 +142,11 @@ client side will nicely updates itself.
 I think this minimal explanation would be enough to start and make our
 hands dirty with some more Javascript code.
 
+
+## Let's start with a mock backed API
+
+Create a `server/api.js` file with the following content:
+
+``` javascript
+
+```

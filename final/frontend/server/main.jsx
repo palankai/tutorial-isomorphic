@@ -9,6 +9,7 @@ import { renderRoutes } from 'react-router-config';
 
 import routes from '../client/routes';
 import webpackDevHelper from './dev';
+import { configureBackend } from './backend';
 
 const app = express();
 
@@ -20,6 +21,8 @@ const isTest = process.env.NODE_ENV === 'test';
 app.set('view engine', 'ejs');
 app.set('views', TEMPLATE_PATH);
 
+
+configureBackend(app);
 
 if (!isProduction && !isTest) {
   webpackDevHelper.useWebpackMiddleware(app);

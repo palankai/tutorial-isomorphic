@@ -8,7 +8,7 @@ import { StaticRouter } from 'react-router-dom';
 import { renderRoutes } from 'react-router-config';
 
 import routes from '../client/routes';
-
+import webpackDevHelper from './dev.js';
 
 const app = express();
 
@@ -19,9 +19,13 @@ const isProduction = process.env.NODE_ENV === 'production';
 app.set('view engine', 'ejs');
 app.set('views', TEMPLATE_PATH);
 
+
+if (!isProduction) {
+  webpackDevHelper.useWebpackMiddleware(app);
+}
+
 app.use(express.static('public'));
 app.use(express.static(BUILD_PATH));
-
 
 function readManifest() {
   if (!isProduction) {

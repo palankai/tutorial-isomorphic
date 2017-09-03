@@ -1,5 +1,8 @@
 const path = require('path');
+
+const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
+
 
 const BUILD_PATH = process.env.BUILD_PATH;
 const SRC_PATH = process.env.SRC_PATH;
@@ -7,13 +10,28 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 let JS_FILENAME = '[name]-[chunkhash].bundle.js';
 
+let entry = [
+  path.resolve(SRC_PATH, 'client', 'application.jsx'),
+];
+
+let plugins = [
+    new ManifestPlugin({
+      fileName: 'manifest.json'
+    })
+];
+
 if (!isProduction) {
   JS_FILENAME = '[name].bundle.js';
+  entry.push('webpack-hot-middleware/client');
+  entry.push('webpack/hot/dev-server');
+  plugins.push(
+    new webpack.HotModuleReplacementPlugin()
+  );
 }
 
 
 module.exports = {
-  entry: path.resolve(SRC_PATH, 'client', 'application.jsx'),
+  entry: entry,
   output: {
     path: path.resolve(BUILD_PATH, 'build'),
     filename: JS_FILENAME
@@ -37,10 +55,6 @@ module.exports = {
       'node_modules'
     ]
   },
-  plugins: [
-    new ManifestPlugin({
-      fileName: 'manifest.json'
-    })
-  ],
+  plugins: plugins,
   devtool: 'source-map'
 };

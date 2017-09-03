@@ -465,13 +465,159 @@ Ideally whenever we modify anything the application should reload itself,
 ideally just the modified piece on the frontend. Lucky us, again, webpack
 has solution for that too.
 
-### Install webpack development tools
+Install the necessary packages first
 
 ``` shell
 # execute inside the container
 npm install --save webpack-dev-middleware webpack-hot-middleware
 ```
 
+We start the refactoring with a very simple modification.
+Modify our `application.jsx`:
+
+``` diff
+  ReactDOM.render(<Application />, document.getElementById('application'));
++
++ if (module.hot) {
++   module.hot.accept();
++ }
+```
+
+We have to implement an express middleware which will reload our client
+side code.
+
+Let's create a `server/dev.js` file:
+
+``` javascript
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
+const webpackconfig = require('../webpack.config.js');
+
+const webpackcompiler = webpack(webpackconfig);
+
+// enable webpack middleware for hot-reloads in development
+function useWebpackMiddleware(app) {
+  app.use(webpackDevMiddleware(webpackcompiler, {
+    publicPath: '/',
+    hot: true,
+    stats: {
+      colors: true,
+      // this reduces the amount of stuff I see in my terminal; configure to your needs
+      chunks: false,
+      'errors-only': true
+    }
+  }));
+  app.use(webpackHotMiddleware(webpackcompiler, {
+    // eslint-disable-next-line no-console
+    log: console.log
+  }));
+
+  console.log('Webpack middleware installed');
+
+  return app;
+}
+
+module.exports = {
+  useWebpackMiddleware
+};
+```
+
+We have to modify how we serve the frontend. Update `main.jsx`
+
+``` diff
+ import { renderRoutes } from 'react-router-config';
+
+ import routes from '../client/routes';
+-
++import webpackDevHelper from './dev.js';
+
+ const app = express();
+
+@@ -19,10 +19,14 @@ const isProduction = process.env.NODE_ENV === 'production';
+ app.set('view engine', 'ejs');
+ app.set('views', TEMPLATE_PATH);
+
++
++if (!isProduction) {
++  webpackDevHelper.useWebpackMiddleware(app);
++}
++
+ app.use(express.static('public'));
+ app.use(express.static(BUILD_PATH));
+
+-
+ function readManifest() {
+   if (!isProduction) {
+```
 
 
 
+Update the `webpack.config.js`
+
+``` diff
+ const path = require('path');
++
++const webpack = require('webpack');
+ const ManifestPlugin = require('webpack-manifest-plugin');
+
++
+ const BUILD_PATH = process.env.BUILD_PATH;
+ const SRC_PATH = process.env.SRC_PATH;
+ const isProduction = process.env.NODE_ENV === 'production';
+
+ let JS_FILENAME = '[name]-[chunkhash].bundle.js';
+
++let entry = [
++  path.resolve(SRC_PATH, 'client', 'application.jsx'),
++];
++
++let plugins = [
++    new ManifestPlugin({
++      fileName: 'manifest.json'
++    })
++];
++
+ if (!isProduction) {
+   JS_FILENAME = '[name].bundle.js';
++  entry.push('webpack-hot-middleware/client');
++  entry.push('webpack/hot/dev-server');
++  plugins.push(
++    new webpack.HotModuleReplacementPlugin()
++  );
+ }
+
+
+ module.exports = {
+-  entry: path.resolve(SRC_PATH, 'client', 'application.jsx'),
++  entry: entry,
+   output: {
+     path: path.resolve(BUILD_PATH, 'build'),
+     filename: JS_FILENAME
+@@ -37,10 +55,6 @@ module.exports = {
+       'node_modules'
+     ]
+   },
+-  plugins: [
+-    new ManifestPlugin({
+-      fileName: 'manifest.json'
+-    })
+-  ],
++  plugins: plugins,
+   devtool: 'source-map'
+ };
+```
+
+### Issue with reload
+
+You might see an error like this. Don't worry about it. It basically complains
+the we've modified our client side code but it doesn't much to the expected
+server side code.
+
+```
+Warning: React attempted to reuse markup in a container but the checksum was invalid. This generally means that you are using server rendering and the markup generated on the server was not what the client was expecting. React injected new markup to compensate which works but you have lost many of the benefits of server rendering. Instead, figure out why the markup being generated is different on the client or server:
+ (client) logging information. etc</p><p data-reac
+ (server) logging information.</p><p data-reactid=
+```
+
+I haven't found any proper solution for this.

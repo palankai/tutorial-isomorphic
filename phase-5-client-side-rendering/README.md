@@ -454,5 +454,24 @@ As you can see on the Network tab of the developer toolbar, we load
 the bundle with the hash. So whenever we modify and rebuild our application
 our users will see the latest code.
 
-## Hot reload
+## Development tools
+
+Developing our application is a very painful operation now. Every time when
+we modify anything we have to rebuild and restart our application. That's
+certainly slow down us. For solving this, we have to modify a bunch of code
+again.
+
+Ideally whenever we modify anything the application should reload itself,
+ideally just the modified piece on the frontend. Lucky us, again, webpack
+has solution for that too.
+
+### Install webpack development tools
+
+``` shell
+# execute inside the container
+npm install --save webpack-dev-middleware webpack-hot-middleware
+```
+
+
+
 

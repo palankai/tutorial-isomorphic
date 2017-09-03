@@ -71,6 +71,22 @@ We walk through the steps of server side routing. Refactor further
 our application.
 
 
+### [Phase 5 - Client Side Rendering](phase-5-client-side-rendering/)
+
+In this chapter I introduce webpack and we explore the challenges of
+client side and server side rendering. At the end of this chapter we
+basically have an universal react web application. Yay.
+
+
+### To Cover / ToDo
+
+- Redux / Router-Redux
+- SASS, extract css, post css
+- Server Code compile
+- Component testing
+- polyfill
+- add more references
+
 ## Disclaimer
 
 I'm not a NodeJS or React expert. I built many websites with JavaScript

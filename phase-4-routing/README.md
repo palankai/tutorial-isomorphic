@@ -370,8 +370,28 @@ Let's wire our ErrorPage component to the `routes.js`.
   export default routes;
 ```
 
-Apparently we don't need to do anything else.
-Feel free to create a much nicer error page.
+We need to do one more small modification. As we've seen the ErrorPage
+component set the status code on the context, we have to set that
+as a response status code in our `main.jsx` as well.
+
+``` diff
+  app.get('*', (req, res) => {
+    const context = {};
+    const HTML = renderToString(
+      <StaticRouter location={req.url} context={context}>
+        {renderRoutes(routes)}
+      </StaticRouter>
+    );
++   const status = context.status || 200;
++   res.status(status).render('index', {
+-   res.render('index', {
+      Application: HTML
+    });
+  });
+```
+
+You might find a little more React(ish) to use something like
+[<Status code=404>](https://github.com/pshrmn/rrc/blob/master/src/Status.js)
 
 
 ## Layout components

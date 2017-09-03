@@ -55,10 +55,20 @@ template engine. Most importantly we introduce
 If you're familiar with Babel and Express you can safely skip this phase.
 
 
-### [Phase 2 - Using React](phase-2-introduce-react/)
+### [Phase 2 - Introduce React](phase-2-introduce-react/)
 
 This chapter will show the basic usage of react and we make our application
 universal.
+
+### [Phase 3 - Deeper understand of components](phase-3-use-react/)
+
+Refactor components deeper
+
+
+### [Phase 4 - Server Side Routing](phase-4-routing/)
+
+We walk through the steps of server side routing. Refactor further
+our application.
 
 
 ## Disclaimer

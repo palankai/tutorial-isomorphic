@@ -115,6 +115,7 @@ module.exports = {
 Create the client side application `client/application.jsx`:
 
 ``` jsx
+/* eslint-env browser */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
@@ -130,7 +131,7 @@ const Application = () => (
 );
 
 
-ReactDOM.render(<Application/>, document.getElementById('application'));
+ReactDOM.render(<Application />, document.getElementById('application'));
 ```
 
 Modify our template file to be able to use the bundle:
@@ -198,8 +199,8 @@ We have to use
 
 ``` diff
   import React from 'react';
-  import { NavLink } from 'react-router-dom';
-+ import { Link } from 'react-router-dom';
+- import { NavLink } from 'react-router-dom';
++ import { NavLink, Link } from 'react-router-dom';
 
   const Navigation = () => (
     <nav className="navbar navbar-inverse navbar-static-top">
@@ -278,6 +279,220 @@ the latest bundle otherwise the application won't work.
 
 Lucky us, webpack has an excellent solution for that.
 
+I haven't said anything about non production code yet, but in the very first
+section we will cover that as well.
+
+Modify our `package.json` first:
+``` diff
+  "scripts": {
+-   "build": "webpack --progress",
++   "build": "NODE_ENV=production webpack -p --progress",
++   "build:dev": "webpack --progress",
+    "start": "babel-node server/serve.js",
+    "test": "mocha --compilers js:babel-core/register",
+    "lint": "eslint . --ext .js,.jsx",
+    "lint:fix": "eslint . --ext .js,.jsx --fix"
+  },
+```
+
+The `-p` option responsible for uglifying our code.
+
+Now we have to modify our `webpack.config.js` as well:
+
+``` diff
+  const path = require('path');
+
+  const BUILD_PATH = process.env.BUILD_PATH;
+  const SRC_PATH = process.env.SRC_PATH;
++ const isProduction = process.env.NODE_ENV === 'production';
+
++ let JS_FILENAME = '[name]-[chunkhash].bundle.js';
+
++ if (!isProduction) {
++   JS_FILENAME = '[name].bundle.js';
++ }
+
+
+  module.exports = {
+    entry: path.resolve(SRC_PATH, 'client', 'application.jsx'),
+    output: {
+      path: path.resolve(BUILD_PATH, 'build'),
+-     filename: 'application.bundle.js'
++     filename: JS_FILENAME
+    },
+    ...
+```
+
+The `npm run build` now produce a file like
+`main-42e3da38d53324b48b27.bundle.js`.
+
+We cannot statically wire it to the `index.ejs` anymore.
+First of all, we have to figure out run time the actual hash value.
+
+Install a new webpack plugin, the
+[Webpack Manifest Plugin](https://github.com/danethurber/webpack-manifest-plugin).
+(As usual - unfortunately - you can find many similar plugin, I haven't figured
+out which is the best, but this one works well for us.)
+
+This plugin writes down a manifest json file which contains the generated
+file names.
+
+``` shell
+# execute inside the container
+npm install --save webpack-manifest-plugin
+```
+
+Modify our `webpack.config.js` file:
+
+``` diff
+  const path = require('path');
++ const ManifestPlugin = require('webpack-manifest-plugin');
+  ...
+  module.exports = {
+    resolve: {
+      extensions: ['.js', '.jsx'],
+      modules: [
+        path.resolve(SRC_PATH, 'client'),
+        'node_modules'
+      ]
+    },
++   plugins: [
++     new ManifestPlugin({
++       fileName: 'manifest.json'
++     })
++   ],
+    devtool: 'source-map'
+  };
+```
+
+If we build our code with `npm run build` it generates a `manifest.json` file
+as well.
+
+``` shell
+# execute inside the container
+/usr/src/frontend # cat /var/lib/frontend/build/manifest.json
+```
+
+```
+{
+  "main.js": "main-42e3da38d53324b48b27.bundle.js",
+  "main.js.map": "main-42e3da38d53324b48b27.bundle.js.map"
+}
+```
+
+The last piece of the puzzle, we want to decide runtime which file we should
+load.
+
+Let's modify our `main.jsx` file, implement to logic for that.
+
+``` diff
+import fs from 'fs';
+import path from 'path';
+
+function readManifest(isProduction) {
+  if (!isProduction) {
+    return {
+      'main.js': 'main.bundle.js'
+    };
+  }
+  return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+}
+```
+
+
+``` diff
++ import fs from 'fs';
+  import path from 'path';
+
+  import express from 'express';
+  import React from 'react';
+  import { renderToString } from 'react-dom/server';
+  import { StaticRouter } from 'react-router-dom';
+  import { renderRoutes } from 'react-router-config';
+
+  import routes from '../client/routes';
+
+
+  const app = express();
+
+  const TEMPLATE_PATH = path.join(process.env.SRC_PATH, 'server', 'templates');
+  const BUILD_PATH = path.join(process.env.BUILD_PATH, 'build');
+
+  app.set('view engine', 'ejs');
+  app.set('views', TEMPLATE_PATH);
+
+  app.use(express.static('public'));
+  app.use(express.static(BUILD_PATH));
++
++ function readManifest() {
++   if (!isProduction) {
++     return {
++       'main.js': 'main.bundle.js'
++     };
++   }
++   return JSON.parse(fs.readFileSync(path.join(BUILD_PATH, 'manifest.json'), 'utf8'));
++ }
+
+  app.get('*', (req, res) => {
+    const context = {};
++   const manifest = readManifest();
++   const script = manifest['main.js'];
+
+    const HTML = renderToString(
+      <StaticRouter location={req.url} context={context}>
+        {renderRoutes(routes)}
+      </StaticRouter>
+    );
+    const status = context.status || 200;
+    res.status(status).render('index', {
+-     Application: HTML
++     Application: HTML,
++     script
+    });
+  });
+
+
+  export default app;
+```
+
+*The way how we added script to the template, called object shorthand, an
+ES6 feature.*
+
+Modify our `index.ejs` file:
+
+``` diff
+  <body>
+    <div id="application"><%- Application %></div>
+-   <script src="application.bundle.js"></script>
++   <script src="<%= script %>"></script>
+  </body>
+```
+
+Modify our `package.json` to separate different type of servers:
+
+``` diff
+  "scripts": {
+    "build": "NODE_ENV=production webpack -p --progress",
+    "build:dev": "webpack --progress",
+-   "start": "babel-node server/serve.js",
++   "start": "NODE_ENV=production babel-node server/serve.js",
++   "dev": "babel-node server/serve.js",
+    "test": "mocha --compilers js:babel-core/register",
+    "lint": "eslint . --ext .js,.jsx",
+    "lint:fix": "eslint . --ext .js,.jsx --fix"
+  },
+```
+
+Please build and start our server again
+``` shell
+# execute inside the container
+npm run build
+npm run start
+```
+
+As you can see on the Network tab of the developer toolbar, we load
+the bundle with the hash. So whenever we modify and rebuild our application
+our users will see the latest code.
 
 ## Hot reload
 

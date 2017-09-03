@@ -1,3 +1,4 @@
+import fs from 'fs';
 import path from 'path';
 
 import express from 'express';
@@ -13,6 +14,7 @@ const app = express();
 
 const TEMPLATE_PATH = path.join(process.env.SRC_PATH, 'server', 'templates');
 const BUILD_PATH = path.join(process.env.BUILD_PATH, 'build');
+const isProduction = process.env.NODE_ENV === 'production';
 
 app.set('view engine', 'ejs');
 app.set('views', TEMPLATE_PATH);
@@ -20,8 +22,21 @@ app.set('views', TEMPLATE_PATH);
 app.use(express.static('public'));
 app.use(express.static(BUILD_PATH));
 
+
+function readManifest() {
+  if (!isProduction) {
+    return {
+      'main.js': 'main.bundle.js'
+    };
+  }
+  return JSON.parse(fs.readFileSync(path.join(BUILD_PATH, 'manifest.json'), 'utf8'));
+}
+
 app.get('*', (req, res) => {
   const context = {};
+  const manifest = readManifest();
+  const script = manifest['main.js'];
+
   const HTML = renderToString(
     <StaticRouter location={req.url} context={context}>
       {renderRoutes(routes)}
@@ -29,7 +44,8 @@ app.get('*', (req, res) => {
   );
   const status = context.status || 200;
   res.status(status).render('index', {
-    Application: HTML
+    Application: HTML,
+    script
   });
 });
 

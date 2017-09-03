@@ -1,3 +1,4 @@
+/* eslint-env browser */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
@@ -13,4 +14,4 @@ const Application = () => (
 );
 
 
-ReactDOM.render(<Application/>, document.getElementById('application'));
+ReactDOM.render(<Application />, document.getElementById('application'));

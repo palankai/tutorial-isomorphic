@@ -12,11 +12,13 @@ import routes from '../client/routes';
 const app = express();
 
 const TEMPLATE_PATH = path.join(process.env.SRC_PATH, 'server', 'templates');
+const BUILD_PATH = path.join(process.env.BUILD_PATH, 'build');
 
 app.set('view engine', 'ejs');
 app.set('views', TEMPLATE_PATH);
 
 app.use(express.static('public'));
+app.use(express.static(BUILD_PATH));
 
 app.get('*', (req, res) => {
   const context = {};

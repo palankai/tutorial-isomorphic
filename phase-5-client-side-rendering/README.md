@@ -349,6 +349,7 @@ Modify our `webpack.config.js` file:
 + const ManifestPlugin = require('webpack-manifest-plugin');
   ...
   module.exports = {
+    ...
     resolve: {
       extensions: ['.js', '.jsx'],
       modules: [
@@ -386,41 +387,9 @@ load.
 Let's modify our `main.jsx` file, implement to logic for that.
 
 ``` diff
-import fs from 'fs';
-import path from 'path';
-
-function readManifest(isProduction) {
-  if (!isProduction) {
-    return {
-      'main.js': 'main.bundle.js'
-    };
-  }
-  return JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-}
-```
-
-
-``` diff
 + import fs from 'fs';
   import path from 'path';
-
-  import express from 'express';
-  import React from 'react';
-  import { renderToString } from 'react-dom/server';
-  import { StaticRouter } from 'react-router-dom';
-  import { renderRoutes } from 'react-router-config';
-
-  import routes from '../client/routes';
-
-
-  const app = express();
-
-  const TEMPLATE_PATH = path.join(process.env.SRC_PATH, 'server', 'templates');
-  const BUILD_PATH = path.join(process.env.BUILD_PATH, 'build');
-
-  app.set('view engine', 'ejs');
-  app.set('views', TEMPLATE_PATH);
-
+  ...
   app.use(express.static('public'));
   app.use(express.static(BUILD_PATH));
 +
@@ -437,22 +406,13 @@ function readManifest(isProduction) {
     const context = {};
 +   const manifest = readManifest();
 +   const script = manifest['main.js'];
-
-    const HTML = renderToString(
-      <StaticRouter location={req.url} context={context}>
-        {renderRoutes(routes)}
-      </StaticRouter>
-    );
-    const status = context.status || 200;
+    ...
     res.status(status).render('index', {
 -     Application: HTML
 +     Application: HTML,
 +     script
     });
   });
-
-
-  export default app;
 ```
 
 *The way how we added script to the template, called object shorthand, an

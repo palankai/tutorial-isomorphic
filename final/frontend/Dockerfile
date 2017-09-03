@@ -18,4 +18,6 @@ COPY . .
 
 RUN npm test
 
-CMD ["npm", "run", "start"]
+RUN npm run build
+
+CMD ["npm", "start"]

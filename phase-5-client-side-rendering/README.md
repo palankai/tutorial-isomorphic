@@ -663,3 +663,38 @@ Modify our `main.jsx` to avoid webpack:
 ```
 
 ### Build at build time
+
+As the last important part of our docker building process, we should build
+the webpack bundle inside the Dockerfile.
+
+``` diff
+  COPY package.json .
+
+  RUN npm install
+
+  COPY . .
+
+  RUN npm test
++
++ RUN npm run build
+
+-  CMD ["npm", "run", "start"]
++  CMD ["npm", "start"]
+```
+
+Let's rebuild the image
+
+``` shell
+# execute on the host
+docker-compose build
+```
+
+Now, we will start the application, but avoid any usage of local code
+we can start the container directly. This basically a production like start:
+
+``` shell
+# execute on the host
+docker run --rm -ti -p 8080:8080 tutorial-frontend
+```
+
+### Browser dev tools

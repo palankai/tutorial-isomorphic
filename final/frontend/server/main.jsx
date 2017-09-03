@@ -15,12 +15,13 @@ const app = express();
 const TEMPLATE_PATH = path.join(process.env.SRC_PATH, 'server', 'templates');
 const BUILD_PATH = path.join(process.env.BUILD_PATH, 'build');
 const isProduction = process.env.NODE_ENV === 'production';
+const isTest = process.env.NODE_ENV === 'test';
 
 app.set('view engine', 'ejs');
 app.set('views', TEMPLATE_PATH);
 
 
-if (!isProduction) {
+if (!isProduction && !isTest) {
   webpackDevHelper.useWebpackMiddleware(app);
 }
 

@@ -43,7 +43,7 @@
     "build:dev": "webpack --progress",
     "start": "NODE_ENV=production babel-node server/serve.js",
     "dev": "babel-node server/serve.js",
-    "test": "mocha --compilers js:babel-core/register",
+    "test": "NODE_ENV=test mocha --compilers js:babel-core/register",
     "lint": "eslint . --ext .js,.jsx",
     "lint:fix": "eslint . --ext .js,.jsx --fix"
   },

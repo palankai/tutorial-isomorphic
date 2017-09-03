@@ -621,3 +621,47 @@ Warning: React attempted to reuse markup in a container but the checksum was inv
 ```
 
 I haven't found any proper solution for this.
+
+
+### Issue with tests
+
+Our tests would fail since the webpack compiler are quiet slow, and
+possible raise a TimeOut error. We also don't want to use webpack when
+we test our application.
+
+We can set in the `package.json` the `NODE_ENV` environment variable
+to `test` and we can use it to avoid webpack compilation.
+
+``` diff
+   "scripts": {
+     "build": "NODE_ENV=production webpack -p --progress",
+     "build:dev": "webpack --progress",
+     "start": "NODE_ENV=production babel-node server/serve.js",
+     "dev": "babel-node server/serve.js",
+-    "test": "mocha --compilers js:babel-core/register",
++    "test": "NODE_ENV=test mocha --compilers js:babel-core/register",
+     "lint": "eslint . --ext .js,.jsx",
+     "lint:fix": "eslint . --ext .js,.jsx --fix"
+   },
+```
+
+
+Modify our `main.jsx` to avoid webpack:
+
+``` diff
+ const TEMPLATE_PATH = path.join(process.env.SRC_PATH, 'server', 'templates');
+ const BUILD_PATH = path.join(process.env.BUILD_PATH, 'build');
+ const isProduction = process.env.NODE_ENV === 'production';
++const isTest = process.env.NODE_ENV === 'test';
+
+ app.set('view engine', 'ejs');
+ app.set('views', TEMPLATE_PATH);
+
+
+-if (!isProduction) {
++if (!isProduction && !isTest) {
+   webpackDevHelper.useWebpackMiddleware(app);
+ }
+```
+
+### Build at build time

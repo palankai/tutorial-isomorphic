@@ -10,14 +10,14 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 let JS_FILENAME = '[name]-[chunkhash].bundle.js';
 
-let entry = [
+const entry = [
   path.resolve(SRC_PATH, 'client', 'application.jsx'),
 ];
 
-let plugins = [
-    new ManifestPlugin({
-      fileName: 'manifest.json'
-    })
+const plugins = [
+  new ManifestPlugin({
+    fileName: 'manifest.json'
+  })
 ];
 
 if (!isProduction) {
@@ -31,7 +31,7 @@ if (!isProduction) {
 
 
 module.exports = {
-  entry: entry,
+  entry,
   output: {
     path: path.resolve(BUILD_PATH, 'build'),
     filename: JS_FILENAME
@@ -55,6 +55,6 @@ module.exports = {
       'node_modules'
     ]
   },
-  plugins: plugins,
+  plugins,
   devtool: 'source-map'
 };

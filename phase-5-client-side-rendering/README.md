@@ -513,8 +513,6 @@ function useWebpackMiddleware(app) {
     log: console.log
   }));
 
-  console.log('Webpack middleware installed');
-
   return app;
 }
 
@@ -530,7 +528,7 @@ We have to modify how we serve the frontend. Update `main.jsx`
 
  import routes from '../client/routes';
 -
-+import webpackDevHelper from './dev.js';
++import webpackDevHelper from './dev';
 
  const app = express();
 
@@ -568,14 +566,14 @@ Update the `webpack.config.js`
 
  let JS_FILENAME = '[name]-[chunkhash].bundle.js';
 
-+let entry = [
++const entry = [
 +  path.resolve(SRC_PATH, 'client', 'application.jsx'),
 +];
 +
-+let plugins = [
-+    new ManifestPlugin({
-+      fileName: 'manifest.json'
-+    })
++const plugins = [
++  new ManifestPlugin({
++    fileName: 'manifest.json'
++  })
 +];
 +
  if (!isProduction) {
@@ -590,7 +588,7 @@ Update the `webpack.config.js`
 
  module.exports = {
 -  entry: path.resolve(SRC_PATH, 'client', 'application.jsx'),
-+  entry: entry,
++  entry,
    output: {
      path: path.resolve(BUILD_PATH, 'build'),
      filename: JS_FILENAME
@@ -603,7 +601,7 @@ Update the `webpack.config.js`
 -      fileName: 'manifest.json'
 -    })
 -  ],
-+  plugins: plugins,
++  plugins,
    devtool: 'source-map'
  };
 ```

@@ -8,7 +8,7 @@ import { StaticRouter } from 'react-router-dom';
 import { renderRoutes } from 'react-router-config';
 
 import routes from '../client/routes';
-import webpackDevHelper from './dev.js';
+import webpackDevHelper from './dev';
 
 const app = express();
 

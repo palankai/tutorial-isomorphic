@@ -22,8 +22,6 @@ function useWebpackMiddleware(app) {
     log: console.log
   }));
 
-  console.log('Webpack middleware installed');
-
   return app;
 }
 

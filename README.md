@@ -78,6 +78,11 @@ client side and server side rendering. At the end of this chapter we
 basically have an universal react web application. Yay.
 
 
+### [Phase 6 - Redux](phase-6-redux/)
+
+This chapter shows how to integrate Redux.
+
+
 ### To Cover / ToDo
 
 - Redux / Router-Redux

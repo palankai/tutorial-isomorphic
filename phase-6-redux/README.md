@@ -120,7 +120,7 @@ be something like this:
 
 ``` json
 {
-  value: 12
+  "value": 12
 }
 ```
 

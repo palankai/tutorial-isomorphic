@@ -237,3 +237,119 @@ Refactor `main.jsx` further, just as do a minimal housekeeping.
 
   export default app;
 ```
+
+## Unite templates
+
+As you might recognised we no longer use all of the template files.
+From this point we only need one.
+Please remove the `submit.ejs` and the `view.ejs` files.
+
+## 404 page
+
+Let's create a new component for our 404 page
+
+We are going to extract the ADR editor, but we won't break it down now.
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/ErrorPage
+```
+
+Create a file inside this folder, called `index.jsx`.
+
+
+``` jsx
+import React from 'react';
+
+import ExcerptList from 'components/ExcerptList';
+import Sidebar from 'components/Sidebar';
+import ArchiveModule from 'components/ArchiveModule';
+import AboutModule from 'components/AboutModule';
+import Navigation from 'components/Navigation';
+
+
+const ErrorPage = () => (
+  <div>
+    <Navigation active="home" />
+    <div className="container">
+      <div className="row">
+        <div className="col-sm-8">
+          <p>Page not found</p>
+        </div>
+        <div className="col-sm-3 col-sm-offset-1">
+          <Sidebar>
+            <AboutModule />
+            <ArchiveModule />
+          </Sidebar>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+export default ErrorPage;
+```
+
+But before we start using it, let's create a test for that.
+
+in our `highLevelTest.js` file do the following modification:
+
+``` diff
+  describe('App', () => {
+    ...
+    describe('/view', () => {
+      ...
+    });
++   describe('when page does not exist', () => {
++     it('responds with status 404', (done) => {
++       chai.request(app)
++         .get('/page-does-not-exist')
++         .end((err, res) => {
++           expect(res).to.have.status(200);
++           done();
++         });
++     });
++     it('response contains expected title', (done) => {
++       chai.request(app)
++         .get('/page-does-not-exist')
++         .end((err, res) => {
++           expect(res.text).to.have.string('Page not found');
++           done();
++         });
++     });
++   });
+  });
+```
+
+The first test pass as we expect, since we don't have that page.
+Let's wire our ErrorPage component to the `routes.js`.
+
+``` diff
+  import Index from 'containers/Index';
+  import View from 'containers/View';
+  import Submit from 'containers/Submit';
++ import ErrorPage from 'components/ErrorPage';
+
+
+  const routes = [
+    { path: '/view',
+      component: View
+    },
+    { path: '/submit',
+      component: Submit
+    },
+    { path: '/',
+      component: Index,
+      exact: true
+-   }
++   },
++   { path: '*',
++     component: ErrorPage
++   }
+  ];
+
+  export default routes;
+```
+
+Apparently we don't need to do anything else.
+Feel free to create a much nicer error page.

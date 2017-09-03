@@ -1,6 +1,7 @@
 import Index from 'containers/Index';
 import View from 'containers/View';
 import Submit from 'containers/Submit';
+import ErrorPage from 'components/ErrorPage';
 
 
 const routes = [
@@ -11,7 +12,11 @@ const routes = [
     component: Submit
   },
   { path: '/',
-    component: Index
+    component: Index,
+    exact: true
+  },
+  { path: '*',
+    component: ErrorPage
   }
 ];
 

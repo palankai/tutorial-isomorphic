@@ -64,4 +64,22 @@ describe('App', () => {
         });
     });
   });
+  describe('when page does not exist', () => {
+    it('responds with status 404', (done) => {
+      chai.request(app)
+        .get('/page-does-not-exist')
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          done();
+        });
+    });
+    it('response contains expected title', (done) => {
+      chai.request(app)
+        .get('/page-does-not-exist')
+        .end((err, res) => {
+          expect(res.text).to.have.string('Page not found');
+          done();
+        });
+    });
+  });
 });

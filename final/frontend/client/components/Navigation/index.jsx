@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
 
 const Navigation = () => (
   <nav className="navbar navbar-inverse navbar-static-top">
@@ -12,7 +12,7 @@ const Navigation = () => (
           <span className="icon-bar" />
           <span className="icon-bar" />
         </button>
-        <a className="navbar-brand" href="/">ADR database</a>
+        <Link to="/" className="navbar-brand">ADR Database</Link>
       </div>
       <div id="navbar" className="navbar-collapse collapse">
         <ul className="nav navbar-nav">

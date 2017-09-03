@@ -51,8 +51,9 @@ Our users have to download the whole page every time when they visit any
 of our pages, even if just the small part of the page get changed.
 With client side rendering we can provide smooth experience to our users.
 
-The first thing to do is install webpack and a bunch of plugins.
+## Setup webpack
 
+The first thing to do is install webpack and a bunch of plugins.
 
 ``` shell
 # execute inside the container
@@ -170,7 +171,103 @@ But if you clicked anywhere else, you would see the whole page reload.
 The reason is, because we use direct links (`<a href="...">...</a>`) to
 navigate.
 
+### Reloading issue
+
+In the next section, we are going to fix the links, basically
+refactoring our client side code. However it isn't enough to restart
+the application anymore. Unfortunately we have to rebuild it every time.
+
+``` shell
+# execute inside the container
+npm run build
+```
+
+We will fix that in this chapter, but use this way for now.
+
 
 ## Fix navigation everywhere
 
+This topic is mainly an exercise, I will show a few example but you
+have to fix the code on your own.
+
+We have to use
+[&lt;Link&gt;](https://reacttraining.com/react-router/web/api/Link)
+
+
+### Fix Navigation
+
+``` diff
+  import React from 'react';
+  import { NavLink } from 'react-router-dom';
++ import { Link } from 'react-router-dom';
+
+  const Navigation = () => (
+    <nav className="navbar navbar-inverse navbar-static-top">
+        ...
++         <Link to="/" className="navbar-brand">ADR Database</Link>
+-         <a className="navbar-brand" href="/">ADR database</a>
+        </div>
+        ...
+      </div>
+    </nav>
+  );
+
+  export default Navigation;
+```
+
+You can left the search form as it is, we will fix that later.
+
+### Fix Archive Module
+
+``` diff
+  import React from 'react';
++ import { Link } from 'react-router-dom';
+
+  const ArchiveModule = () => (
+    <div className="sidebar-module">
+      <h4>Archives</h4>
+      <ol className="list-unstyled">
+-       <li><a href="/?byDate=2017-03">March 2017</a></li>
+-       <li><a href="/?byDate=2017-02">February 2017</a></li>
+-       <li><a href="/?byDate=2017-01">January 2017</a></li>
++       <li><Link to="/?byDate=2017-03">March 2017</Link></li>
++       <li><Link to="/?byDate=2017-02">February 2017</Link></li>
++       <li><Link to="/?byDate=2017-01">January 2017</Link></li>
+      </ol>
+    </div>
+  );
+
+  export default ArchiveModule;
+```
+
+### Fix Excerpt
+
+``` diff
+  import React from 'react';
++ import { Link } from 'react-router-dom';
+
+  const Excerpt = () => (
+    <article className="Adr">
+      <header>
+-       <h2 className="Adr-title"><a href="/view">Sample decision</a></h2>
+-       <p className="Adr-meta"><a className="app-adr-code" href="/view">ADR-0001</a> January 1, 2014 by <a href="#">Mark</a></p>
++       <h2 className="Adr-title"><Link to="/view">Sample decision</Link></h2>
++       <p className="Adr-meta"><Link className="app-adr-code" to="/view">ADR-0001</Link> January 1, 2014 by <a href="#">Mark</a></p>
+      </header>
+      ...
+      <footer>
+-       <a href="/view">Read more</a>
++       <Link href="/view">Read more</Link>
+      </footer>
+    </article>
+  );
+
+export default Excerpt;
+```
+
+You can fix the rest, but as we work we will fix the them.
+
+## Differentiate production and development build
+
+## Hot reload
 

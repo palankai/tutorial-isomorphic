@@ -391,7 +391,7 @@ as a response status code in our `main.jsx` as well.
 ```
 
 You might find a little more React(ish) to use something like
-[<Status code=404>](https://github.com/pshrmn/rrc/blob/master/src/Status.js)
+[&lt;Status code=404&gt;](https://github.com/pshrmn/rrc/blob/master/src/Status.js)
 
 
 ## Layout components

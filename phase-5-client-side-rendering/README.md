@@ -269,5 +269,15 @@ You can fix the rest, but as we work we will fix the them.
 
 ## Differentiate production and development build
 
+However it works well so far but there a few issue here.
+First of all, the bundle code is way too detailed, lots of comments there.
+We want to have the small as possible bundle.
+
+The other issue is, when we deploy a new version our users have to download
+the latest bundle otherwise the application won't work.
+
+Lucky us, webpack has an excellent solution for that.
+
+
 ## Hot reload
 

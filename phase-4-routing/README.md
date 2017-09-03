@@ -617,7 +617,7 @@ In this case we will use a specialised version of link, the
 
 ``` diff
   import React from 'react';
-  import PropTypes from 'prop-types';
+- import PropTypes from 'prop-types';
 + import { NavLink } from 'react-router-dom';
 
 

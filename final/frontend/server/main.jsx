@@ -25,8 +25,8 @@ app.get('*', (req, res) => {
       {renderRoutes(routes)}
     </StaticRouter>
   );
-
-  res.render('index', {
+  const status = context.status || 200;
+  res.status(status).render('index', {
     Application: HTML
   });
 });

@@ -69,7 +69,7 @@ describe('App', () => {
       chai.request(app)
         .get('/page-does-not-exist')
         .end((err, res) => {
-          expect(res).to.have.status(200);
+          expect(res).to.have.status(404);
           done();
         });
     });

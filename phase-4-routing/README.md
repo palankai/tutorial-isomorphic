@@ -260,6 +260,7 @@ Create a file inside this folder, called `index.jsx`.
 
 ``` jsx
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import ExcerptList from 'components/ExcerptList';
 import Sidebar from 'components/Sidebar';
@@ -268,24 +269,42 @@ import AboutModule from 'components/AboutModule';
 import Navigation from 'components/Navigation';
 
 
-const ErrorPage = () => (
-  <div>
-    <Navigation active="home" />
-    <div className="container">
-      <div className="row">
-        <div className="col-sm-8">
-          <p>Page not found</p>
-        </div>
-        <div className="col-sm-3 col-sm-offset-1">
-          <Sidebar>
-            <AboutModule />
-            <ArchiveModule />
-          </Sidebar>
+class ErrorPage extends React.Component {
+
+  static contextTypes = {
+    router: PropTypes.shape({
+      staticContext: PropTypes.object
+    }).isRequired
+  }
+
+  componentWillMount() {
+    const { staticContext } = this.context.router;
+    if (staticContext) {
+      staticContext.status = 404;
+    }
+  }
+
+  render() {
+    return (
+      <div>
+        <Navigation active="home" />
+        <div className="container">
+          <div className="row">
+            <div className="col-sm-8">
+              <p>Page not found</p>
+            </div>
+            <div className="col-sm-3 col-sm-offset-1">
+              <Sidebar>
+                <AboutModule />
+                <ArchiveModule />
+              </Sidebar>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-);
+    );
+  }
+}
 
 export default ErrorPage;
 ```
@@ -305,7 +324,7 @@ in our `highLevelTest.js` file do the following modification:
 +       chai.request(app)
 +         .get('/page-does-not-exist')
 +         .end((err, res) => {
-+           expect(res).to.have.status(200);
++           expect(res).to.have.status(404);
 +           done();
 +         });
 +     });
@@ -483,11 +502,28 @@ export default routes;
 
 ``` jsx
 import React from 'react';
+import PropTypes from 'prop-types';
 
 
-const ErrorPage = () => (
-  <p>Page not found</p>
-);
+class ErrorPage extends React.Component {
+
+  static contextTypes = {
+    router: PropTypes.shape({
+      staticContext: PropTypes.object
+    }).isRequired
+  }
+
+  componentWillMount() {
+    const { staticContext } = this.context.router;
+    if (staticContext) {
+      staticContext.status = 404;
+    }
+  }
+
+  render() {
+    return (<p>Page not found</p>);
+  }
+}
 
 export default ErrorPage;
 ```

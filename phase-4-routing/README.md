@@ -353,3 +353,197 @@ Let's wire our ErrorPage component to the `routes.js`.
 
 Apparently we don't need to do anything else.
 Feel free to create a much nicer error page.
+
+
+## Layout components
+
+You might noticed, we still have some duplication. Now we have 4 pages
+(including the error page) and all of them have navigation, etc.
+
+Let's create a `RootLayout` component.
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/RootLayout
+```
+
+Create a file inside this folder, called `index.jsx`.
+
+
+``` jsx
+import React from 'react';
+import PropTypes from 'prop-types';
+import { renderRoutes } from 'react-router-config';
+
+import Navigation from 'components/Navigation';
+
+
+const RootLayout = ({ route }) => (
+  <div>
+    <Navigation active="home" />
+    <div className="container">
+      {renderRoutes(route.routes)}
+    </div>
+  </div>
+);
+
+RootLayout.propTypes = {
+  route: PropTypes.object.isRequired
+};
+
+
+export default RootLayout;
+```
+
+Note that, we only accept 1 child, but that one is required!
+
+Let's create a `ContentLayout` component.
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/components/ContentLayout
+```
+
+Create a file inside this folder, called `index.jsx`.
+
+``` jsx
+import React from 'react';
+import PropTypes from 'prop-types';
+import { renderRoutes } from 'react-router-config';
+
+import Sidebar from 'components/Sidebar';
+import ArchiveModule from 'components/ArchiveModule';
+import AboutModule from 'components/AboutModule';
+
+
+const ContentLayout = ({ route }) => (
+  <div className="row">
+    <div className="col-sm-8">
+      {renderRoutes(route.routes)}
+    </div>
+    <div className="col-sm-3 col-sm-offset-1">
+      <Sidebar>
+        <AboutModule />
+        <ArchiveModule />
+      </Sidebar>
+    </div>
+  </div>
+);
+
+ContentLayout.propTypes = {
+  route: PropTypes.object.isRequired
+};
+
+
+export default ContentLayout;
+```
+
+Modify our `routes.js` file to use these layouts:
+
+``` javascript
+import Index from 'containers/Index';
+import View from 'containers/View';
+import Submit from 'containers/Submit';
+import ErrorPage from 'components/ErrorPage';
+
+import RootLayout from 'components/RootLayout';
+import ContentLayout from 'components/ContentLayout';
+
+
+const routes = [
+  { component: RootLayout,
+    routes: [
+      { path: '/submit',
+        component: Submit
+      },
+      { component: ContentLayout,
+        routes: [
+          { path: '/view',
+            component: View
+          },
+          { path: '/',
+            component: Index,
+            exact: true
+          },
+          { path: '*',
+            component: ErrorPage
+          }
+        ]
+      }
+    ]
+  }
+];
+
+export default routes;
+```
+
+### Finally we have to modify our pages as well
+
+#### ErrorPage
+
+``` jsx
+import React from 'react';
+
+
+const ErrorPage = () => (
+  <p>Page not found</p>
+);
+
+export default ErrorPage;
+```
+
+#### Index container
+
+``` jsx
+import React from 'react';
+
+import ExcerptList from 'components/ExcerptList';
+
+
+const Index = () => (
+  <ExcerptList />
+);
+
+export default Index;
+```
+
+#### View container
+
+``` jsx
+import React from 'react';
+
+import ADR from 'components/ADR';
+import Toolbar from 'components/Toolbar';
+
+
+const View = () => (
+  <div>
+    <Toolbar />
+    <ADR />
+    <Toolbar />
+  </div>
+);
+
+export default View;
+```
+
+#### Submit container
+
+``` jsx
+import React from 'react';
+
+import Editor from 'components/Editor';
+
+const Submit = () => (
+  <div className="row">
+    <div className="col-sm-12">
+      <Editor />
+    </div>
+  </div>
+);
+
+export default Submit;
+```
+
+Feel free to extract the remaining layout(ish) elements from the Submit.
+

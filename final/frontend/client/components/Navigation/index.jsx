@@ -1,7 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { NavLink } from 'react-router-dom';
 
-const Navigation = ({ active }) => (
+
+const Navigation = () => (
   <nav className="navbar navbar-inverse navbar-static-top">
     <div className="container">
       <div className="navbar-header">
@@ -15,16 +16,8 @@ const Navigation = ({ active }) => (
       </div>
       <div id="navbar" className="navbar-collapse collapse">
         <ul className="nav navbar-nav">
-          {active === 'home' ?
-            <li className="active"><a href="/">Home</a></li>
-            :
-            <li ><a href="/">Home</a></li>
-          }
-          {active === 'submit' ?
-            <li className="active"><a href="/submit">Submit</a></li>
-            :
-            <li><a href="/submit">Submit</a></li>
-          }
+          <li><NavLink to="/" activeClassName="active" exact>Home</NavLink></li>
+          <li><NavLink to="/submit" activeClassName="active" exact>Submit</NavLink></li>
         </ul>
         <form className="navbar-form navbar-right" action="index">
           <div className="input-group">
@@ -40,13 +33,5 @@ const Navigation = ({ active }) => (
     </div>
   </nav>
 );
-
-Navigation.propTypes = {
-  active: PropTypes.string
-};
-
-Navigation.defaultProps = {
-  active: 'Stranger'
-};
 
 export default Navigation;

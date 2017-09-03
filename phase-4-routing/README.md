@@ -427,7 +427,7 @@ const RootLayout = ({ route }) => (
 );
 
 RootLayout.propTypes = {
-  route: PropTypes.object.isRequired
+  route: PropTypes.shape({}).isRequired
 };
 
 
@@ -470,7 +470,7 @@ const ContentLayout = ({ route }) => (
 );
 
 ContentLayout.propTypes = {
-  route: PropTypes.object.isRequired
+  route: PropTypes.shape({}).isRequired
 };
 
 
@@ -602,4 +602,81 @@ export default Submit;
 ```
 
 Feel free to extract the remaining layout(ish) elements from the Submit.
+
+
+## Fix links with Link
+
+We did a bit ugly hack in our navigation component to be able to show
+which menu item is active. Since we have Router we can use a built-in component
+called `Link`. That works better especially if we want to use with different
+Routers. For clarification, we use the Static Router, but on client side
+we will use Browser Router.
+
+In this case we will use a specialised version of link, the
+[&lt;NavLink /&gt;](https://reacttraining.com/react-router/web/api/NavLink).
+
+``` diff
+  import React from 'react';
+  import PropTypes from 'prop-types';
++ import { NavLink } from 'react-router-dom';
+
+
+- const Navigation = ({ active }) => (
++ const Navigation = () => (
+    <nav className="navbar navbar-inverse navbar-static-top">
+    ...
+          <ul className="nav navbar-nav">
++           <li><NavLink to="/" activeClassName="active" exact>Home</NavLink></li>
++           <li><NavLink to="/submit" activeClassName="active" exact>Submit</NavLink></li>
+-           {active === 'home' ?
+-             <li className="active"><a href="/">Home</a></li>
+-             :
+-             <li ><a href="/">Home</a></li>
+-           }
+-           {active === 'submit' ?
+-             <li className="active"><a href="/submit">Submit</a></li>
+-             :
+-             <li><a href="/submit">Submit</a></li>
+-           }
+          </ul>
+    ...
+    </nav>
+  );
+-
+- Navigation.propTypes = {
+-   active: PropTypes.string
+- };
+-
+- Navigation.defaultProps = {
+-   active: 'Stranger'
+- };
+
+  export default Navigation;
+```
+
+Let's remove the `active` property of Navigation inside the `RootLayout`
+component:
+
+``` diff
+  const RootLayout = ({ route }) => (
+    <div>
+-     <Navigation active="home" />
++     <Navigation />
+      <div className="container">
+        {renderRoutes(route.routes)}
+      </div>
+    </div>
+  );
+```
+
+Unfortunately we have to modify our css as well,
+please add the following code to the end of `public/styles.css`
+
+``` css
+.navbar-nav>li>a.active {
+  color: #ffffff;
+}
+```
+
+We have to overrule bootstrap style.
 

@@ -15,7 +15,7 @@ const RootLayout = ({ route }) => (
 );
 
 RootLayout.propTypes = {
-  route: PropTypes.object.isRequired
+  route: PropTypes.shape({}).isRequired
 };
 
 

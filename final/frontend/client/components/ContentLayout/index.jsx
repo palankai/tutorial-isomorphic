@@ -22,7 +22,7 @@ const ContentLayout = ({ route }) => (
 );
 
 ContentLayout.propTypes = {
-  route: PropTypes.object.isRequired
+  route: PropTypes.shape({}).isRequired
 };
 
 

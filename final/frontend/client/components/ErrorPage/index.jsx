@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 
 class ErrorPage extends React.Component {
-
   static contextTypes = {
     router: PropTypes.shape({
       staticContext: PropTypes.object

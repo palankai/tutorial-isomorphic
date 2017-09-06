@@ -619,7 +619,7 @@ function configureBackendEndpoints(app) {
 export { backend, configureBackendEndpoints };
 ```
 
-### Restore reducuer
+### Restore reducer
 
 Modify back our `reducer.js`, get rid of the generated content.
 
@@ -665,4 +665,48 @@ We have to modify our `main.jsx` file, to be able to access the data.
 ```
 
 At this point, we have the working endpoint: http://localhost:8080/api/records
+
+### Create an action
+
+We are going to create a few actions which helps us to load the data
+on both server and client side.
+
+Create a new file inside store, called `actions.js`:
+
+``` javascript
+const REQUEST_EXCERPTS = 'REQUEST_EXCERPTS';
+const RECEIVE_EXCERPTS = 'RECEIVE_EXCERPTS';
+const RECEIVE_EXCERPTS_FAILED = 'RECEIVE_EXCERPTS_FAILED';
+
+
+export function requestExcerpts() {
+  return (dispatch, { backend }) => {
+    return backend.getItems().then(
+      response => dispatch(receiveExcerpts(response.items)),
+      error => dispatch(receiveExcerptsFailed('Error'))
+    );
+  };
+}
+
+export function receiveExcerpts(items) {
+  return {
+    type: RECEIVE_EXCERPTS,
+    items
+  };
+}
+
+export function receiveExcerptsFailed(error) {
+  return {
+    type: RECEIVE_EXCERPTS_FAILED,
+    error
+  };
+}
+```
+
+These functions are the action creators. The action is a simple data structure,
+which instructs the reducers to change create a new store.
+
+
+### Let's see some reducer
+
 

@@ -7,8 +7,16 @@ import ExcerptList from 'components/ExcerptList';
 
 class Index extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.items = [];
+    if (this.props.data) {
+      this.items = this.props.data.items;
+    }
+  }
+
   render() {
-    return <ExcerptList items={this.props.data.items}/>;
+    return <ExcerptList items={this.items}/>;
   }
 
 }

@@ -12,6 +12,7 @@ import serialize from 'serialize-javascript';
 import routes from '../client/routes';
 import webpackDevHelper from './dev';
 import initStore from 'store/store';
+import { backend, configureBackendEndpoints } from './backend';
 
 const app = express();
 
@@ -28,6 +29,7 @@ if (!isProduction && !isTest) {
   webpackDevHelper.useWebpackMiddleware(app);
 }
 
+configureBackendEndpoints(app);
 app.use(express.static('public'));
 app.use(express.static(BUILD_PATH));
 

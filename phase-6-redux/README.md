@@ -440,8 +440,16 @@ import ExcerptList from 'components/ExcerptList';
 
 class Index extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.items = [];
+    if (this.props.data) {
+      this.items = this.props.data.items;
+    }
+  }
+
   render() {
-    return <ExcerptList items={this.props.data.items}/>;
+    return <ExcerptList items={this.items}/>;
   }
 
 }
@@ -469,6 +477,9 @@ The wrapper component subscribe to the store, and if anything get changed
 in it, it rerender the wrapped element. We don't really have to worry about,
 how and when we receive new state (in this stage), but if we do, our Index
 component will be rerendered.
+
+This component is a container, now. It receives data, and connected to the
+outside world.
 
 #### Let's take a look to the ExcerptList component
 
@@ -506,6 +517,9 @@ Modify the `ExcerptList/index.jsx` file:
  export default ExcerptList;
 ```
 
+This module is pretty dumb, doesn't really care where is that items
+coming from. Later we will take care of the pager as well, as it is also
+important part of our application.
 
 #### The Excerpt component
 
@@ -549,3 +563,106 @@ Modify the `Excerpt/index.jsx` file:
 ```
 
 Please see, we changed the links as well!
+As you can see, this module is still very dumb, doesn't know anything about
+the data or where it is coming from.
+
+
+## Load data on client side
+
+For this first we are going to make this data available on an endpoint of
+our express application, then we modify our code to being able to read that.
+There is a very tricky part of that modification, when we have to decide
+what we want to load.
+
+
+### Make the data available through the express app
+
+Create a new file under the `server` folder, called `backend.js`:
+
+``` javascript
+import loremIpsum from 'lorem-ipsum';
+
+class Backend {
+
+  getItems() {
+    return new Promise((resolve, reject) => {
+      resolve({
+        items: [
+          {
+            id: 'ADR-0001',
+            title: loremIpsum({count: 3, units: 'words'}),
+            excerpt: loremIpsum({count: 1, units: 'paragraph'})
+          },
+          {
+            id: 'ADR-0002',
+            title: loremIpsum({count: 3, units: 'words'}),
+            excerpt: loremIpsum({count: 1, units: 'paragraph'})
+          }
+        ]
+      });
+    });
+  }
+
+}
+
+const backend = new Backend();
+
+function configureBackendEndpoints(app) {
+  app.get('/api/records/', (req, res) => {
+     backend.getItems().then((data) => {
+       res.setHeader('Content-Type', 'application/json');
+       res.send(JSON.stringify(data));
+     });
+   });
+}
+
+export { backend, configureBackendEndpoints };
+```
+
+### Restore reducuer
+
+Modify back our `reducer.js`, get rid of the generated content.
+
+``` diff
+-import loremIpsum from 'lorem-ipsum';
+-
+-
+ const initialState = {
+-  index: {
+-    items: [
+-      {
+-        id: 'ADR-0001',
+-        title: loremIpsum({count: 3, units: 'words'}),
+-        excerpt: loremIpsum({count: 1, units: 'paragraph'})
+-      },
+-      {
+-        id: 'ADR-0002',
+-        title: loremIpsum({count: 3, units: 'words'}),
+-        excerpt: loremIpsum({count: 1, units: 'paragraph'})
+-      }
+-    ]
+-  }
+ };
+```
+
+### Ensure the data and the endpoint
+
+We have to modify our `main.jsx` file, to be able to access the data.
+
+``` diff
+ import routes from '../client/routes';
+ import webpackDevHelper from './dev';
+ import initStore from 'store/store';
++import { backend, configureBackendEndpoints } from './backend';
+ ...
+ if (!isProduction && !isTest) {
+   webpackDevHelper.useWebpackMiddleware(app);
+ }
+
++configureBackendEndpoints(app);
+ app.use(express.static('public'));
+ app.use(express.static(BUILD_PATH));
+```
+
+At this point, we have the working endpoint: http://localhost:8080/api/records
+

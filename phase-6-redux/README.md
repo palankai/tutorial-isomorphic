@@ -13,6 +13,11 @@ side but using the very similar API in client side.
 We will use [Redux](http://redux.js.org/) which is not a React plugin
 but works well with it.
 
+For helping to understand what is going on in our application we are going
+to install the
+[Redux DevTools Extension](https://github.com/zalmoxisus/redux-devtools-extension)
+as well.
+
 ## Recap
 
 Build the docker image
@@ -142,3 +147,237 @@ client side will nicely updates itself.
 I think this minimal explanation would be enough to start and make our
 hands dirty with some more Javascript code.
 
+
+## Wire up Redux
+
+Instead of giving you more lectures to read, I show you how can you setup
+everything. Our first setup won't do much, but I cannot show how can you
+build it progressively.
+
+Install the required packages:
+
+``` shell
+# execute inside the container
+npm install --save redux react-redux redux-thunk serialize-javascript redux-devtools-extension
+```
+
+### Create Reducers
+
+Reducers are pure Javascript functions which suppose to process change request
+against the store. As I mentioned earlier the state should never change,
+so the reducers should give back a new state fraction. The root reducer should
+give back a completely new state.
+
+We don't have much reducers at this time, so focus on a simple function
+which gives back the initial state.
+
+Create a folder which will hold our data management code.
+
+``` shell
+# execute on the host
+mkdir -p frontend/client/store
+```
+
+Create a file, `reducers.js` with the following content:
+``` javascript
+const initialState = {
+};
+
+
+function rootReducer(state = initialState, action) {
+  // For now, don't handle any actions
+  // and just return the state given to us.
+  return state;
+}
+
+
+export default rootReducer;
+```
+
+Later we will talk more about it.
+
+
+### Create Store
+
+Store is basically the bridge. We will see later, how can we dispatch actions
+to the store, and how can receive the latest state out of it.
+
+
+The following file contains the code which creates the store,
+call it `store.js`:
+``` javascript
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import rootReducer from './reducers';
+import { composeWithDevTools } from 'redux-devtools-extension';
+
+
+function initStore(stateFromServer = {}, extra = {}) {
+  return createStore(
+    rootReducer,
+    stateFromServer,
+    composeWithDevTools(applyMiddleware(thunk.withExtraArgument(extra)))
+  );
+}
+
+
+export default initStore;
+```
+
+Let see some explanation. We want to create the store in server side first,
+fill up with data, then transfer the data to client side and initialise
+the store again. However we also want to pass some extra variable (like
+API configuration) to our action handlers (see it later). I know it isn't
+clear why we write lots of unused code, but I promise you will see how
+useful it is.
+
+
+### Small package.json tweak
+
+``` diff
+ "babel": {
+   "presets": [
+     "react",
+     "env",
+     "stage-0"
+   ],
+   "plugins": [
+     [
+       "module-resolver",
+       {
+         "root": [
+           "./"
+         ],
+         "alias": {
+           "components": "./client/components",
+-          "containers": "./client/containers"
++          "containers": "./client/containers",
++          "store": "./client/store"
+         }
+       }
+     ]
+   ]
+ },
+```
+
+
+### Wire Redux to the Server side
+
+``` diff
+ import express from 'express';
+ import React from 'react';
+ import { renderToString } from 'react-dom/server';
+ import { StaticRouter } from 'react-router-dom';
+ import { renderRoutes } from 'react-router-config';
++import { Provider } from 'react-redux';
++import serialize from 'serialize-javascript';
+
+ import routes from '../client/routes';
+ import webpackDevHelper from './dev';
++import initStore from 'store/store';
+ ...
+ function readManifest() {
+   if (!isProduction) {
+     return {
+       'main.js': 'main.bundle.js'
+     };
+   }
+   return JSON.parse(fs.readFileSync(path.join(BUILD_PATH, 'manifest.json'), 'utf8'));
+ }
++
++function prefetch() {
++  const store = initStore();
++  return new Promise((resolve, reject) => {
++    resolve(store);
++  });
++}
+
+ app.get('*', (req, res) => {
+   const context = {};
+   const manifest = readManifest();
+   const script = manifest['main.js'];
+
+-  const HTML = renderToString(
+-    <StaticRouter location={req.url} context={context}>
+-      {renderRoutes(routes)}
+-    </StaticRouter>
+-  );
+-  const status = context.status || 200;
+-  res.status(status).render('index', {
+-    Application: HTML,
+-    script
+-  });
++  prefetch().then((store) => {
++    const HTML = renderToString(
++      <Provider store={store}>
++        <StaticRouter location={req.url} context={context}>
++          {renderRoutes(routes)}
++        </StaticRouter>
++      </Provider>
++    );
++    const status = context.status || 200;
++    res.status(status).render('index', {
++      Application: HTML,
++      script,
++      state: serialize(store.getState())
++    });
++  });
+ });
+```
+
+Later in the prefetch method we will really prefetch some data. But for now,
+it's enough to have a possible async function to create and load the store.
+
+The last piece of this puzzle is that we have to transfer the state to the
+client side, which have to initialise the store with that.
+You may spot some interesting fact about this method. We actually transfer
+the state twice. Obviously, the `__PRELOADED__` global value will contain
+but actually the rendered HTML contains as well.
+
+We have to modify the `index.ejs` as it follows:
+``` diff
+ <body>
+   <div id="application"><%- Application %></div>
+   <script src="<%= script %>"></script>
++  <script>
++  window.__PRELOADED_STATE__ = <%- state %>;
++  </script>
+ </body>
+```
+
+
+### Wire Redux to the Client side
+
+We only have to modify our `client/application.jsx` file to use that value.
+``` javascript
+ /* eslint-env browser */
+ import React from 'react';
+ import ReactDOM from 'react-dom';
+ import { BrowserRouter } from 'react-router-dom';
+ import { renderRoutes } from 'react-router-config';
++import { Provider } from 'react-redux'
+
+ import routes from './routes';
++import initStore from 'store/store';
+
++
++const store = initStore(window.__PRELOADED_STATE__);
+
+ const Application = () => (
+-  <BrowserRouter>
+-    {renderRoutes(routes)}
+-  </BrowserRouter>
++  <Provider store={store}>
++    <BrowserRouter>
++      {renderRoutes(routes)}
++    </BrowserRouter>
++  </Provider>
+ );
+
+
+ ReactDOM.render(<Application />, document.getElementById('application'));
+
+ if (module.hot) {
+   module.hot.accept();
+ }
+```

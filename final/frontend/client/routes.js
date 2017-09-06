@@ -6,6 +6,8 @@ import ErrorPage from 'components/ErrorPage';
 import RootLayout from 'components/RootLayout';
 import ContentLayout from 'components/ContentLayout';
 
+import { requestExcerpts } from 'store/actions';
+
 
 const routes = [
   { component: RootLayout,
@@ -20,7 +22,8 @@ const routes = [
           },
           { path: '/',
             component: Index,
-            exact: true
+            exact: true,
+            action: requestExcerpts
           },
           { path: '*',
             component: ErrorPage

@@ -1,27 +1,25 @@
-const REQUEST_EXCERPTS = 'REQUEST_EXCERPTS';
-const RECEIVE_EXCERPTS = 'RECEIVE_EXCERPTS';
-const RECEIVE_EXCERPTS_FAILED = 'RECEIVE_EXCERPTS_FAILED';
+export const EXCERPTS = {
+  LOADING: 'EXCERPT.LOADING',
+  RECEIVE: 'EXCERPT.RECEIVE',
+  FAILED: 'EXCERPT.FAILED',
+  UNLOAD: 'EXCERPT.UNLOAD'
+};
 
 
 export function requestExcerpts() {
-  return (dispatch, { backend }) => {
+  return (dispatch, getState, { backend }) => {
+    dispatch({
+      type: EXCERPTS.LOADING
+    });
     return backend.getItems().then(
-      response => dispatch(receiveExcerpts(response.items)),
-      error => dispatch(receiveExcerptsFailed('Error'))
+      response => dispatch({type: EXCERPTS.RECEIVE, items: response.items}),
+      error => dispatch({type: EXCERPTS.FAILED, error: 'error'})
     );
   };
 }
 
-export function receiveExcerpts(items) {
+export function unloadExcerpts() {
   return {
-    type: RECEIVE_EXCERPTS,
-    items
-  };
-}
-
-export function receiveExcerptsFailed(error) {
-  return {
-    type: RECEIVE_EXCERPTS_FAILED,
-    error
+    type: EXCERPTS.UNLOAD
   };
 }

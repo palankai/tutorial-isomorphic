@@ -5,7 +5,7 @@ import express from 'express';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
-import { renderRoutes } from 'react-router-config';
+import { matchRoutes, renderRoutes } from 'react-router-config';
 import { Provider } from 'react-redux';
 import serialize from 'serialize-javascript';
 
@@ -42,11 +42,20 @@ function readManifest() {
   return JSON.parse(fs.readFileSync(path.join(BUILD_PATH, 'manifest.json'), 'utf8'));
 }
 
-function prefetch() {
-  const store = initStore();
-  return new Promise((resolve, reject) => {
-    resolve(store);
+function prefetch(branch) {
+  const store = initStore(undefined, { backend });
+  const promises = [];
+  branch.map(({ route }) => {
+    if (route.action) {
+      promises.push(store.dispatch(route.action()));
+    }
   });
+  return new Promise((resolve) => {
+    Promise.all(promises).then(() => {
+      resolve(store);
+    });
+  });
+
 }
 
 app.get('*', (req, res) => {
@@ -54,7 +63,8 @@ app.get('*', (req, res) => {
   const manifest = readManifest();
   const script = manifest['main.js'];
 
-  prefetch().then((store) => {
+  const branch = matchRoutes(routes, req.url);
+  prefetch(branch).then((store) => {
     const HTML = renderToString(
       <Provider store={store}>
         <StaticRouter location={req.url} context={context}>

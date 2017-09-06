@@ -1,12 +1,34 @@
-const initialState = {
-};
+import { combineReducers } from 'redux';
+
+import { EXCERPTS } from './actions';
 
 
-function rootReducer(state = initialState, action) {
-  // For now, don't handle any actions
-  // and just return the state given to us.
-  return state;
+function index(state = null, action) {
+  switch (action.type) {
+    case EXCERPTS.LOADING:
+      return {
+        state: 'loading'
+      };
+    case EXCERPTS.RECEIVE:
+      return {
+        state: 'loaded',
+        items: action.items
+      };
+    case EXCERPTS.FAILED:
+      return {
+        state: 'error',
+        error: action.error
+      };
+    case EXCERPTS.UNLOAD:
+      return {};
+  default:
+    return state;
+  }
 }
+
+const rootReducer = combineReducers({
+  index
+});
 
 
 export default rootReducer;

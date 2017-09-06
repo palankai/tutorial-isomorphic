@@ -9,8 +9,7 @@ import routes from './routes';
 import initStore from 'store/store';
 
 
-const store = initStore(window.STATE_FROM_SERVER);
-
+const store = initStore(window.__PRELOADED_STATE__);
 
 const Application = () => (
   <Provider store={store}>

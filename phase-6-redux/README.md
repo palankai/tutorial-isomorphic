@@ -674,31 +674,29 @@ on both server and client side.
 Create a new file inside store, called `actions.js`:
 
 ``` javascript
-const REQUEST_EXCERPTS = 'REQUEST_EXCERPTS';
-const RECEIVE_EXCERPTS = 'RECEIVE_EXCERPTS';
-const RECEIVE_EXCERPTS_FAILED = 'RECEIVE_EXCERPTS_FAILED';
+export const EXCERPTS = {
+  LOADING: 'EXCERPT.LOADING',
+  RECEIVE: 'EXCERPT.RECEIVE',
+  FAILED: 'EXCERPT.FAILED',
+  UNLOAD: 'EXCERPT.UNLOAD'
+};
 
 
 export function requestExcerpts() {
-  return (dispatch, { backend }) => {
+  return (dispatch, getState, { backend }) => {
+    dispatch({
+      type: EXCERPTS.LOADING
+    });
     return backend.getItems().then(
-      response => dispatch(receiveExcerpts(response.items)),
-      error => dispatch(receiveExcerptsFailed('Error'))
+      response => dispatch({type: EXCERPTS.RECEIVE, items: response.items}),
+      error => dispatch({type: EXCERPTS.FAILED, error: 'error'})
     );
   };
 }
 
-export function receiveExcerpts(items) {
+export function unloadExcerpts() {
   return {
-    type: RECEIVE_EXCERPTS,
-    items
-  };
-}
-
-export function receiveExcerptsFailed(error) {
-  return {
-    type: RECEIVE_EXCERPTS_FAILED,
-    error
+    type: EXCERPTS.UNLOAD
   };
 }
 ```
@@ -706,12 +704,100 @@ export function receiveExcerptsFailed(error) {
 These functions are the action creators. The action is a simple data structure,
 which instructs the reducers to change create a new store.
 
+
 **TODO: Modify how we create the store**
 
 ### Let's see some reducer
+
+``` javascript
+import { combineReducers } from 'redux';
+
+import { EXCERPTS } from './actions';
+
+
+function index(state = null, action) {
+  switch (action.type) {
+    case EXCERPTS.LOADING:
+      return {
+        state: 'loading'
+      };
+    case EXCERPTS.RECEIVE:
+      return {
+        state: 'loaded',
+        items: action.items
+      };
+    case EXCERPTS.FAILED:
+      return {
+        state: 'error',
+        error: action.error
+      };
+    case EXCERPTS.UNLOAD:
+      return {};
+  default:
+    return state;
+  }
+}
+
+const rootReducer = combineReducers({
+  index
+});
+
+export default rootReducer;
+```
 
 ### ToDo
 
 - Modify how we create the store, pass the backend
 - Create the client side backend and pass that to the thunk
 
+### Modify router, in that way we know what to dispatch to prefetch
+
+``` diff
+ { path: '/',
+   component: Index,
+-  exact: true,
++  exact: true,
++  action: requestExcerpts
+ },
+```
+
+### Modify main.jsx to pass backend to the store, and process the necessary
+actions
+
+``` diff
+ import { StaticRouter } from 'react-router-dom';
+-import { renderRoutes } from 'react-router-config';
++import { matchRoutes, renderRoutes } from 'react-router-config';
+ import { Provider } from 'react-redux';
+ ...
+-function prefetch() {
+-  const store = initStore();
+-  return new Promise((resolve, reject) => {
+-    resolve(store);
+-  });
+-}
++function prefetch(branch) {
++  const store = initStore(undefined, { backend });
++  const promises = [];
++  branch.map(({ route }) => {
++    if (route.action) {
++      promises.push(store.dispatch(route.action()));
++    }
++  });
++  return new Promise((resolve) => {
++    Promise.all(promises).then(() => {
++      resolve(store);
++    });
++  });
++}
+ ...
+ app.get('*', (req, res) => {
+   const context = {};
+   const manifest = readManifest();
+   const script = manifest['main.js'];
+
++  const branch = matchRoutes(routes, req.url);
++  prefetch(branch).then((store) => {
+-  prefetch().then((store) => {
+
+```

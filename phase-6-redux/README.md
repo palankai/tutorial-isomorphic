@@ -212,7 +212,7 @@ import rootReducer from './reducers';
 import { composeWithDevTools } from 'redux-devtools-extension';
 
 
-function initStore(stateFromServer = {}, extra = {}) {
+function initStore(stateFromServer = undefined, extra = undefined) {
   return createStore(
     rootReducer,
     stateFromServer,
@@ -381,3 +381,171 @@ We only have to modify our `client/application.jsx` file to use that value.
    module.hot.accept();
  }
 ```
+
+## Initialise the store with some realistic data
+
+Even I said, real data, I'm going to use a lorem-ipsum generator to
+initialise our store. The first version that we are going to build
+is only put some static(ish) content to the store when we initialise on
+the server side.
+
+``` shell
+# execute inside the container
+npm install --save lorem-ipsum
+```
+
+Then open and edit the `reducers.js`:
+``` diff
++import loremIpsum from 'lorem-ipsum';
++
++
+ const initialState = {
++  index: {
++    items: [
++      {
++        id: 'ADR-0001',
++        title: loremIpsum({count: 3, units: 'words'}),
++        excerpt: loremIpsum({count: 1, units: 'paragraph'})
++      },
++      {
++        id: 'ADR-0002',
++        title: loremIpsum({count: 3, units: 'words'}),
++        excerpt: loremIpsum({count: 1, units: 'paragraph'})
++      }
++    ]
++  }
+ };
+```
+
+The plan is we will keep data about the index page, under the `index` key
+of the store.
+
+At this point, if we restart our application, we can see the state on
+the redux dev extension.
+
+### Make our Index page aware of the state
+
+We have to drastically refactor our Index page component. Right now,
+it does more or less nothing. Let's see how we have to modify that:
+
+Rewrite the `containers/Index/index.jsx`:
+
+``` jsx
+import React from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+
+import ExcerptList from 'components/ExcerptList';
+
+
+class Index extends React.Component {
+
+  render() {
+    return <ExcerptList items={this.props.data.items}/>;
+  }
+
+}
+
+Index.propTypes = {
+  data: PropTypes.shape({
+    items:PropTypes.array
+  })
+};
+
+export default connect(
+  state => ({
+    data: state.index
+  })
+)(Index);
+```
+
+#### Explanation
+
+We started to use the class form of react components. Which isn't much
+difference. We defined a prop type for the Index, called `data`, but you
+cannot really spot it where we call it with that. The trick in the connect
+function. The connect function basically decorates the Index component.
+The wrapper component subscribe to the store, and if anything get changed
+in it, it rerender the wrapped element. We don't really have to worry about,
+how and when we receive new state (in this stage), but if we do, our Index
+component will be rerendered.
+
+#### Let's take a look to the ExcerptList component
+
+We don't have to modify much, but we have to make sure it receives
+the data and show them.
+
+Modify the `ExcerptList/index.jsx` file:
+``` diff
+ import React from 'react';
++import PropTypes from 'prop-types';
+
+ import Pager from 'components/Pager';
+ import Excerpt from './Excerpt';
+
+-const ExcerptList = () => (
++const ExcerptList = ({items}) => (
+   <div>
+     <div className="app-header">
+       <h1 className="app-title">ADR database</h1>
+       <p className="lead app-description">Architectural Decision Records keep track of decisions which ever made</p>
+     </div>
++    {items.map((item) =>
++      <Excerpt key={item.id} id={item.id} title={item.title} excerpt={item.excerpt}/>
++    )}
+     <footer>
+       <Pager />
+     </footer>
+   </div>
+ );
++
++ExcerptList.propTypes = {
++  items:PropTypes.array
++};
+
+ export default ExcerptList;
+```
+
+
+#### The Excerpt component
+
+The last, very obvious thing is to modify the Excerpt component
+to be able to use the parameters.
+
+Modify the `Excerpt/index.jsx` file:
+
+``` diff
+ import React from 'react';
+ import { Link } from 'react-router-dom';
++import PropTypes from 'prop-types';
+
+-const Excerpt = () => (
++const Excerpt = ({id, title, excerpt}) => (
+   <article className="Adr">
+     <header>
+-      <h2 className="Adr-title"><Link to="/view">Sample decision</Link></h2>
+-      <p className="Adr-meta"><Link className="app-adr-code" to="/view">ADR-0001</Link> January 1, 2014 by <a href="#">Mark</a></p>
++      <h2 className="Adr-title"><Link to={'/view/' + id}>{title}</Link></h2>
++      <p className="Adr-meta"><Link className="app-adr-code" to={'/view/' + id}>{id}</Link> January 1, 2014 by <a href="#">Mark</a></p>
+     </header>
+     <section>
+-      <p>Cum sociis natoque penatibus et magnis nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
++      <p>{excerpt}</p>
+     </section>
+     <footer>
+-      <Link to="/view">Read more</Link>
++      <Link to={`/view/${id}`}>Read more</Link>
+     </footer>
+   </article>
+ );
++
++Excerpt.propTypes = {
++  id: PropTypes.string,
++  title: PropTypes.string,
++  excerpt: PropTypes.string
++};
+
+ export default Excerpt;
+```
+
+Please see, we changed the links as well!

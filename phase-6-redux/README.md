@@ -706,7 +706,12 @@ export function receiveExcerptsFailed(error) {
 These functions are the action creators. The action is a simple data structure,
 which instructs the reducers to change create a new store.
 
+**TODO: Modify how we create the store**
 
 ### Let's see some reducer
 
+### ToDo
+
+- Modify how we create the store, pass the backend
+- Create the client side backend and pass that to the thunk
 

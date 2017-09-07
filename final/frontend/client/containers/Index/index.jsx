@@ -27,7 +27,7 @@ class Index extends React.Component {
   componentWillReceiveProps() {
     this.setState((prevState, props) => ({
       ...prevState,
-      status: props.data.status,
+      status: props.data.state,
       items: props.data.items
     }));
   }
@@ -43,7 +43,10 @@ class Index extends React.Component {
   }
 
   render() {
-    return <ExcerptList items={this.state.items}/>;
+    if( this.state.status == 'loaded' ) {
+      return <ExcerptList items={this.state.items}/>;
+    }
+    return <p>Loading...</p>;
   }
 
 }

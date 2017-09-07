@@ -994,7 +994,7 @@ Let's update our Index container component:
 +componentWillReceiveProps() {
 +  this.setState((prevState, props) => ({
 +    ...prevState,
-+    status: props.data.status,
++    status: props.data.state,
 +    items: props.data.items
 +  }));
 +}
@@ -1022,3 +1022,65 @@ but when the state of the component get changed, it can be rerendered.
 If you want to do any update on the component, you have to update the state
 object. You should use the `setState` method, which manages the status
 changes. However, it isn't guaranteed the state object change immediately.
+
+### Loaders
+
+We will implement a very-very simple loader. But first we have to slow
+down our client side receiver.
+
+Add a minimal timeout to the client side `backend.js`.
+
+``` diff
+ import axios from 'axios';
+
+
+ class Backend {
+
+   getItems() {
+     return new Promise(async (resolve, reject) => {
+       const response = await axios.get('http://localhost:8080/api/records/');
+-      resolve(response.data);
++      setTimeout(function() {
++        resolve(response.data);
++      }, 3000);
+     });
+   }
+
+ }
+
+ export const backend = new Backend();
+```
+
+Just be careful, do not left it in the production code!
+
+Now we only have to modify the the render method of our Index component:
+
+This is the new render method:
+``` diff
+render() {
+  if( this.state.status == 'loaded' ) {
+    return <ExcerptList items={this.state.items}/>;
+  }
+  return <p>Loading...</p>;
+}
+```
+
+## Refactor the View page
+
+That refactoring is very similar that we did below.
+
+You have to do the following:
+- Create actions which manages the state of view.
+- Add a Backend function on server side to generate the data
+- Add the Backend function on the client side to load the data
+- Modify the components to use the data
+- Wire the View container component to use the state
+
+There is a tricky part, the view actually has an argument.
+
+## Finally
+
+If you hit this point, you still have a long-long journey.
+I plant to finish this work, including SCSS processing, form manipulation,
+integrate components which are not really React compatible.
+

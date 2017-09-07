@@ -40,3 +40,9 @@ Minimal Javascript knowledge is enough.
 
 As I mentioned I'm not an expert. I started learning the whole thing
 3 months ago.
+
+## How we are doing?
+
+We will create every file by hand. Please checkout my github repository
+and work inside the `phase-x...` folders. In every phase will contain
+the code of the previous one.

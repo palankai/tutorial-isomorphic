@@ -338,13 +338,14 @@ We have to modify the `index.ejs` as it follows:
 ``` diff
  <body>
    <div id="application"><%- Application %></div>
-   <script src="<%= script %>"></script>
 +  <script>
 +  window.__PRELOADED_STATE__ = <%- state %>;
 +  </script>
+   <script src="<%= script %>"></script>
  </body>
 ```
 
+The order of scripts are very important!
 
 ### Wire Redux to the Client side
 
@@ -444,7 +445,7 @@ class Index extends React.Component {
     super(props);
     this.items = [];
     if (this.props.data) {
-      this.items = this.props.data.items;
+      this.items = this.props.data.items || [];
     }
   }
 
@@ -566,18 +567,43 @@ Please see, we changed the links as well!
 As you can see, this module is still very dumb, doesn't know anything about
 the data or where it is coming from.
 
+## Load the data on server side
 
-## Load data on client side
-
-For this first we are going to make this data available on an endpoint of
-our express application, then we modify our code to being able to read that.
-There is a very tricky part of that modification, when we have to decide
-what we want to load.
+In this section we will modify our server side code, to load the data rather
+than use static initial state. We don't go any further on server side,
+but you will see, from this point you can call any remote API-s, access
+to a database to collect the data that's necessary.
 
 
-### Make the data available through the express app
+### Restore reducer
 
-Create a new file under the `server` folder, called `backend.js`:
+Modify back our `reducer.js`, get rid of the static content.
+
+``` diff
+-import loremIpsum from 'lorem-ipsum';
+-
+-
+ const initialState = {
+-  index: {
+-    items: [
+-      {
+-        id: 'ADR-0001',
+-        title: loremIpsum({count: 3, units: 'words'}),
+-        excerpt: loremIpsum({count: 1, units: 'paragraph'})
+-      },
+-      {
+-        id: 'ADR-0002',
+-        title: loremIpsum({count: 3, units: 'words'}),
+-        excerpt: loremIpsum({count: 1, units: 'paragraph'})
+-      }
+-    ]
+-  }
+ };
+```
+
+### Create a Backend which can serve the data
+
+In the server code, please create a `backend.js`:
 
 ``` javascript
 import loremIpsum from 'lorem-ipsum';
@@ -607,64 +633,21 @@ class Backend {
 
 const backend = new Backend();
 
+
 function configureBackendEndpoints(app) {
   app.get('/api/records/', (req, res) => {
-     backend.getItems().then((data) => {
-       res.setHeader('Content-Type', 'application/json');
-       res.send(JSON.stringify(data));
-     });
-   });
+    backend.getItems().then((data) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(JSON.stringify(data));
+    });
+  });
 }
 
 export { backend, configureBackendEndpoints };
 ```
 
-### Restore reducer
-
-Modify back our `reducer.js`, get rid of the generated content.
-
-``` diff
--import loremIpsum from 'lorem-ipsum';
--
--
- const initialState = {
--  index: {
--    items: [
--      {
--        id: 'ADR-0001',
--        title: loremIpsum({count: 3, units: 'words'}),
--        excerpt: loremIpsum({count: 1, units: 'paragraph'})
--      },
--      {
--        id: 'ADR-0002',
--        title: loremIpsum({count: 3, units: 'words'}),
--        excerpt: loremIpsum({count: 1, units: 'paragraph'})
--      }
--    ]
--  }
- };
-```
-
-### Ensure the data and the endpoint
-
-We have to modify our `main.jsx` file, to be able to access the data.
-
-``` diff
- import routes from '../client/routes';
- import webpackDevHelper from './dev';
- import initStore from 'store/store';
-+import { backend, configureBackendEndpoints } from './backend';
- ...
- if (!isProduction && !isTest) {
-   webpackDevHelper.useWebpackMiddleware(app);
- }
-
-+configureBackendEndpoints(app);
- app.use(express.static('public'));
- app.use(express.static(BUILD_PATH));
-```
-
-At this point, we have the working endpoint: http://localhost:8080/api/records
+This code also has an extra step, it makes the data available on the client
+side, which comes very handy soon.
 
 ### Create an action
 
@@ -705,8 +688,6 @@ These functions are the action creators. The action is a simple data structure,
 which instructs the reducers to change create a new store.
 
 
-**TODO: Modify how we create the store**
-
 ### Let's see some reducer
 
 ``` javascript
@@ -745,10 +726,6 @@ const rootReducer = combineReducers({
 export default rootReducer;
 ```
 
-### ToDo
-
-- Modify how we create the store, pass the backend
-- Create the client side backend and pass that to the thunk
 
 ### Modify router, in that way we know what to dispatch to prefetch
 
@@ -761,14 +738,38 @@ export default rootReducer;
  },
 ```
 
-### Modify main.jsx to pass backend to the store, and process the necessary
-actions
+This is a crucial part of the modification. I haven't find any best practice
+or actually any good working example for this problem, so I solved this way.
+In the next subsection, we will modify the server code which renders the
+application to prefetch the data. But how can it be prefetched?
+
+The flow as we saw before is simple. Initialise the state with an empty
+object, then render the components. Along the way (as they figure it out)
+they possibly dispatch some actions (we will see that on the client side)
+to have the necessary data. But in server side it's too late. Because
+we want to render the HTML with the data, we have to know beforehand the
+actions needs to be dispatched, being able to dispatch, wait for the response
+and when we receive all of them, we can finally render the HTML.
+
+I'm curios what is your opinion, how would you solve that.
+
+
+### Modify main.jsx to pass backend to the store, and process the necessary actions
 
 ``` diff
  import { StaticRouter } from 'react-router-dom';
 -import { renderRoutes } from 'react-router-config';
 +import { matchRoutes, renderRoutes } from 'react-router-config';
  import { Provider } from 'react-redux';
+ ...
+ import routes from '../client/routes';
+ import webpackDevHelper from './dev';
+ import initStore from 'store/store';
++import { backend, configureBackendEndpoints } from './backend';
+ ...
++configureBackendEndpoints(app);
+ app.use(express.static('public'));
+ app.use(express.static(BUILD_PATH));
  ...
 -function prefetch() {
 -  const store = initStore();
@@ -799,5 +800,225 @@ actions
 +  const branch = matchRoutes(routes, req.url);
 +  prefetch(branch).then((store) => {
 -  prefetch().then((store) => {
-
 ```
+
+Now if we load our application, you won't notice much difference, although
+the data is come from the backend now.
+We can also test that our random data is accessible:
+http://localhost:8080/api/records
+
+## Load data on the client side
+
+At this point the server side is ready, client side is close to ready.
+
+### Make the data disappear
+
+We will do a little trick to demonstrate that we can load the data
+on client side as well. When we leave the index page, we remove the data
+from the store.
+
+In order to do that, we have to modify the Index component:
+
+``` diff
+ class Index extends React.Component {
+
+   constructor(props) {
+     super(props);
+     this.items = [];
+     if (this.props.data) {
+       this.items = this.props.data.items;
+     }
+   }
++
++  componentWillUnmount() {
++    this.props.onUnload();
++  }
+
+   render() {
+     return <ExcerptList items={this.items}/>;
+   }
+
+ }
+
+ Index.propTypes = {
+   data: PropTypes.shape({
+     items:PropTypes.array
+   })
+ };
+
++const mapDispatchToProps = dispatch => {
++  return {
++    onUnload: () => {
++      dispatch(unloadExcerpts());
++    }
++  };
++};
++
++const mapStateToProps = state => {
++  return {
++    data: state.index
++  };
++};
++
++export default connect(
++  mapStateToProps,
++  mapDispatchToProps
++)(Index);
+-export default connect(
+-  state => ({
+-    data: state.index
+-  })
+-)(Index);
+```
+
+We added an interesting method, `componentWillUnmount`. React triggers that
+method right before unmount the component. We dispatch the unload action,
+which clears the state. If we now try our application, load the index page,
+then load one of the ADR, then click back, we will see, there is no more
+preloaded items. This is more or less the expected behaviour, of course we
+have to load the data from the server, but we don't want to show outdated
+data to our users. We can even add an expiration time to our internal state,
+but I think the best to make it disappear.
+
+### Build a Backend class on client side
+
+The first thing that we have to do is build a Backend (for client).
+This backend will have the same shape (which is very important) as the
+backend on the server side.
+
+First install a simple AJAX library, called
+[axios](https://github.com/mzabriskie/axios).
+
+``` shell
+# execute inside the container
+npm install --save axios
+```
+
+Then we are going to create a `backend.js` but now in the `client` folder.
+
+``` javascript
+import axios from 'axios';
+
+
+class Backend {
+
+  getItems() {
+    return new Promise(async (resolve, reject) => {
+      const response = await axios.get('http://localhost:8080/api/records/');
+      resolve(response.data);
+    });
+  }
+
+}
+
+export const backend = new Backend();
+```
+
+I believe this code is pretty self explanatory.
+The only trick is the use of await, which is just a syntax sugar, hiding
+the fact, that we are using an other Promise.
+
+We might want to create some stub backend and then inherit from it from
+both client and backend side, to make sure the both have share the same
+shape. Probably that will be useful for testing as well.
+
+### Ensure this backend on client side
+
+Open and edit the `appliation.jsx`
+
+``` diff
+ import routes from './routes';
+ import initStore from 'store/store';
++import { backend } from './backend';
+
+
+-const store = initStore(window.__PRELOADED_STATE__);
++const store = initStore(window.__PRELOADED_STATE__, { backend });
+
+
+ const Application = () => (
+```
+
+### A small but very important requirements
+
+Being able to use the the very similar code on both server and client
+side we have to install a small package: 
+[babel-polyfill](https://babeljs.io/docs/usage/polyfill/)
+
+``` shell
+# execute inside the container
+npm install --save babel-polyfill
+```
+
+We also have to import it as the first import of our `application.jsx`:
+
+``` diff
+ /* eslint-env browser */
++import 'babel-polyfill';
+ import React from 'react';
+ import ReactDOM from 'react-dom';
+ ...
+```
+
+There are multiple ways to ensure that, but I've find this the simplest.
+You can even use webpack to ensure it.
+
+### Load the data on client side, then
+
+We only have to dispatch the the `requestExcerpts` action from our component,
+if the data is not there.
+
+Let's update our Index container component:
+
+``` diff
+ constructor(props) {
+   super(props);
+-  this.items = [];
+-  if (this.props.data) {
+-    this.items = this.props.data.items;
+-  }
++  this.state = {
++    items: [],
++    status: null
++  };
++  this.items = [];
++  this.status = null;
++  if (this.props.data) {
++    this.state = {
++      items: this.props.data.items || [],
++      status: this.props.data.state || null
++    };
++  }
+ }
++
++componentWillReceiveProps() {
++  this.setState((prevState, props) => ({
++    ...prevState,
++    status: props.data.status,
++    items: props.data.items
++  }));
++}
++
++componentWillMount() {
++  if( this.state.status === null ) {
++    this.props.onLoad();
++  }
++}
+
+ componentWillUnmount() {
+   this.props.onUnload();
+ }
+
+ render() {
+-  return <ExcerptList items={this.props.items}/>;
++  return <ExcerptList items={this.state.items}/>;
+ }
+```
+
+We had to modify a lot again. The reason why we switched to use the `state`
+instead of the simply the props that the Component instance created once,
+but when the state of the component get changed, it can be rerendered.
+
+If you want to do any update on the component, you have to update the state
+object. You should use the `setState` method, which manages the status
+changes. However, it isn't guaranteed the state object change immediately.

@@ -1,0 +1,16 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.15.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node server/serve.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

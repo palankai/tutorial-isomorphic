@@ -7,8 +7,8 @@ We're going to create a docker compose file and the minimal folder structure.
 
 ### Create the host folder for our project
 
+Execute: on the host
 ``` shell
-# execute on the host
 mkdir frontend
 ```
 I plan to use multiple docker containers and this will be our frontend
@@ -16,10 +16,20 @@ application container.
 
 
 ### Create Docker file
+
 [reference](https://docs.docker.com)
 
-Create a file called `frontend/Dockerfile`.
+Create a file called `Dockerfile`.
 
+If you want to use shell to create a file, feel free to use the following
+command:
+
+Execute: on the host
+``` shell
+touch frontend/Dockerfile
+```
+
+File: `frontend/Dockerfile`
 ``` Dockerfile
 FROM node:alpine
 
@@ -37,12 +47,15 @@ WORKDIR $SRC_PATH
 CMD ["ash"]
 ```
 
+Our docker image already has [Node.js](https://nodejs.org/en/) installed.
+
 ### Create Docker Compose file
 
 [reference](https://docs.docker.com/compose/)
 
 Create a docker compose file: `docker-compose.yml`
 
+File: `docker-compose.yml`
 ``` yaml
 version: "3"
 services:
@@ -62,15 +75,15 @@ volumes:
 
 ### Build our very first image
 
+Execute: on the host
 ``` shell
-# execute on the host
 docker-compose build
 ```
 
 ### Start our container
 
+Execute: on the host
 ``` shell
-# execute on the host
 docker-compose run --service-ports --rm tutorial-frontend ash
 ```
 
@@ -78,20 +91,31 @@ At this point we have an up and running node environment.
 Let's test the following commands just to understand which version of
 NodeJS we have.
 
-``` bash
-# execute inside the container
+Execute: inside the container
+``` shell
 node --version
-# output: v8.1.3
-
-npm --version
-# output: 5.0.3
 ```
 
-If you see a version which is older than those, please pull the
+Expected output
+```
+v8.4.0
+```
+
+Execute: inside the container
+``` shell
+npm --version
+```
+
+Expected output
+```
+5.3.0
+```
+
+If you see a version which is older than these, please pull the
 latest `alpine:node` and build your `tutorial-frontend` image again.
 
+Execute: on the host
 ``` bash
-# execute on the host
 docker pull node:alpine
 ```
 
@@ -106,8 +130,8 @@ about our project including the dependencies.
 With the following command you can create the `package.json`. If you omit the
 `-y` flag `npm` will ask a few question about the project.
 
+Execute: inside the container
 ``` bash
-# execute inside the container
 npm init -y
 ```
 
@@ -117,54 +141,54 @@ container we can see and edit the files outside.
 ## Create a static website
 
 In this section we are going to create a simple
-(Express)[https://expressjs.com/] web server which only suppose to serve
+[Express](https://expressjs.com/) web server which only suppose to serve
 our static HTML files and the related resources.
 
 ### Install express js via npm
 
+Execute: inside the container
 ``` bash
-# execute inside the container
 npm install --save express
 ```
 The command above install the web application framework and also save
 the dependency in our project `package.json` file.
+Please see how the this file get changed.
 
 ### Build our first website
 
 First thing to do is create a folder our publicly available files and copy
 those resources there.
 
+Execute: on the host
 ``` bash
-# execute on the host
-
-# Create a folder for public files
 mkdir -p frontend/public
-
 cp -R ../html/* frontend/public/
 ```
 
 Now we are going to create the server code.
 
+Execute: on the host
 ``` bash
-# execute on the host
 mkdir -p frontend/server
 ```
 
 Create a file inside our `server` folder, called `main.js`.
 
+File: `frontend/server/main.js`
 ``` javascript
 const express = require('express');
 const app = express();
 
 app.use(express.static('public'));
 
-export default app;
+module.exports = app;
 ```
 
 And create a file next to it, called `serve.js`.
 
+File: `frontend/server/serve.js`
 ``` javascript
-import app from './main';
+const app = require('./main.js');
 
 app.listen(8080, function () {
   console.log('Example app listening on port 8080!');
@@ -173,8 +197,8 @@ app.listen(8080, function () {
 
 ### Let's do a manual test
 
+Execute: inside the container
 ``` bash
-# execute inside the container
 node server/serve.js
 ```
 
@@ -182,144 +206,176 @@ Click on the following link: http://localhost:8080/
 
 That's great that works ;)
 
+
 The last missing step which come very handy later is tweak our `package.json`
 to manage the application startup. Replace the dummy test script with
 something more useful (at the moment)
 
+File: `frontend/package.json`
 ``` diff
-  "scripts": {
--    "test": "echo \"Error: no test specified\" && exit 1"
-+    "start": "node server/serve.js"
-  },
-
+ "scripts": {
+-   "test": "echo \"Error: no test specified\" && exit 1"
++   "start": "node server/serve.js"
+ },
 ```
 
 Repeat our manual test:
 
+Execute: inside the container
 ``` bash
-# execute inside the container
-npm run start
+npm start
 ```
+
+[Checkpoint 1](../checkpoints/checkpoint-1/)
 
 ## Use latest JavaScript features
 
 Let's modify our JavaScript server code a bit.
 
+File: `frontend/server/main.js`
 ``` diff
-- const express = require('express');
-+ import express from 'express';
+-const express = require('express');
++import express from 'express';
 +
-const app = express();
+ const app = express();
 
-app.use(express.static('public'));
+ app.use(express.static('public'));
 
-app.listen(8080, function () {
-  console.log('Example app listening on port 8080!')
-});
+ app.listen(8080, function () {
+   console.log('Example app listening on port 8080!')
+ });
+
+-module.exports = app;
++export default app;
+```
+
+File: `frontend/server/serve.js`
+``` diff
+-const app = require('./main.js');
++import app from './main';
+
+ app.listen(8080, function () {
+   console.log('Example app listening on port 8080!');
+ });
 ```
 
 if we restart our server application it will fail to start.
 
+Execute: inside the container
 ``` bash
-# execute inside the container
-npm run start
+npm start
 ```
 
-### Install babel to compile our code
+It will probably say something like this:
 
-[Babel](http://babeljs.io) is a pluggable javascript compiler.
+```
+/usr/src/frontend/server/serve.js:1
+(function (exports, require, module, __filename, __dirname) { import app from './main';
+                                                              ^^^^^^
+
+SyntaxError: Unexpected token import
+    at createScript (vm.js:74:10)
+    at Object.runInThisContext (vm.js:116:10)
+    ...
+```
+
+There is a very simple reason Node.js doesn't understand the way how we
+want to import code.
+
+### Install babel to transpile our code
+
+[Babel](http://babeljs.io) is a pluggable javascript transpiler.
 You could read more [about babel plugins](http://babeljs.io/docs/plugins/).
 
+Execute: inside the container
 ``` shell
-# execution inside the container
 npm install --save babel-cli babel-preset-env babel-preset-stage-0
 ```
 
 If we change the `package.json` file again, we can use babel.
 
 
+File: `frontend/package.json`
 ``` diff
-  "scripts": {
--    "start": "node server/serve.js"
-+    "start": "babel-node server/serve.js"
-  },
-```
-
-Start the server again and see what we have on http://localhost:8080/
-
-``` bash
-# execute inside the container
-npm run start
-```
-
-However it's already good enough, we have to make sure we can use every
-feature that we want. So add a babel configuration to our project
-configuration.
-
-"babel": {"presets": ["env", "stage-0"]}
-``` diff
-  "scripts": {
-    "start": "babel-node server/serve.js"
-  },
-+  "babel": {"presets": ["env", "stage-0"]},
+ "scripts": {
+-   "start": "node server/serve.js"
++   "start": "babel-node server/serve.js"
+ },
++"babel": {"presets": ["env", "stage-0"]},
 ```
 
 We will improve that configuration later.
 
+Execute: inside the container
+``` bash
+npm start
+```
+
+Click on the following link: http://localhost:8080/
+
+[Checkpoint 2](../checkpoints/checkpoint-2/)
+
 ## Improve our Dockerfile
 
+File: `frontend/Dockerfile`
 ``` diff
-RUN ln -s $SRC_PATH/node_modules/ $BUILD_PATH/node_modules
+ RUN ln -s $SRC_PATH/node_modules/ $BUILD_PATH/node_modules
 
-WORKDIR $SRC_PATH
+ WORKDIR $SRC_PATH
 
-+ COPY package.json .
++COPY package.json .
 +
-+ RUN npm install
++RUN npm install
 +
-+ COPY . .
++COPY . .
 +
-- CMD ["ash"]
-+ CMD ["npm", "run", "start"]
++CMD ["npm", "start"]
+-CMD ["ash"]
 ```
 
 Let's rebuild our image and start the container again.
 
+Execute: on the host
 ``` shell
-# execute on the host
-
 docker-compose build
 
 docker-compose run --service-ports --rm tutorial-frontend
 ```
 
+Click on the following link: http://localhost:8080/
+
+[Checkpoint 3](../checkpoints/checkpoint-3/)
+
 ## Create a test to check whether our HTML generated well
 
-We are going to use [Mocha](https://mochajs.org/), [Chai](http://chaijs.com/) and
-[Sinon](http://sinonjs.org/).
+We are going to use [Mocha](https://mochajs.org/), [Chai](http://chaijs.com/)
+and [Sinon](http://sinonjs.org/).
 
+Execute: inside the container
 ``` shell
-# execution inside the container
 npm install --save-dev mocha chai chai-http sinon
 ```
 
 I found some bug when I started to run the real tests later. Workaround
 is simple, just install the following packages as well.
 
+Execute: inside the container
 ``` shell
-# execution inside the container
 npm install --save-dev combined-stream delayed-stream
 ```
 
+Execute: on the host
 ``` shell
-# execute on the host
 mkdir frontend/test
 ```
 
 Create a sanity test, create a file fronted/test/sanity.js
 
+File: `frontend/test/sanity.js`
 ``` javascript
 import assert from 'assert';
+
+
 describe('Array', function() {
   describe('#indexOf()', function() {
     it('should return -1 when the value is not present', function() {
@@ -331,27 +387,29 @@ describe('Array', function() {
 
 Finally extend our `package.json` to be able to execute the test.
 
+File: `frontend/package.json`
 ``` diff
-  "scripts": {
-    "start": "babel-node server/serve.js",
-+     "test": "mocha --compilers js:babel-core/register"
-  },
+ "scripts": {
+-   "start": "babel-node server/serve.js",
++   "start": "babel-node server/serve.js"
++   "test": "mocha --compilers js:babel-core/register"
+ },
 ```
 
+Execute: inside the container
 ``` shell
-# execution inside the container
 npm test
 ```
 
 So far we didn't do any useful, so let's create a test against our page.
 
-Let's create a more useful test. Let's check whether the app is became
+Let's check whether the app is became
 available, so create a file in out test folder called `highLevelTest.js`.
 In this file we will write some high level assertion to make sure
 the HTML rendered well for each endpoint.
 We won't test much functionality just, some piece of expected content.
 
-
+File: `frontend/test/highLevelTest.js`
 ``` javascript
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -424,17 +482,52 @@ describe('App', function() {
 
 At this point we can remove out sanity test.
 
-## Improve our Dockerfile again, include tests in the build
-
-``` diff
-RUN npm install
-
-COPY . .
-+
-+ RUN npm test
-
-CMD ["npm", "run", "start"]
+Execute: on host
+``` shell
+rm frontend/test/sanity.js
 ```
+
+Execute: inside the container
+``` shell
+npm test
+```
+
+Tests should pass, and if they do you should see output like this:
+
+```
+ App
+    /
+      ✓ responds with status 200 (39ms)
+      ✓ response contains expected title
+    /submit
+      ✓ responds with status 200
+      ✓ response contains expected title
+    /view
+      ✓ responds with status 200
+      ✓ response contains expected title
+```
+
+### Improve our Dockerfile again, include tests in the build
+
+File: `frontend/Dockerfile`
+``` diff
+ RUN npm install
+
+ COPY . .
++
++RUN npm test
+
+ CMD ["npm", "start"]
+```
+
+Let's rebuild our image again
+
+Execute: on host
+``` shell
+docker-compose build
+```
+
+[Checkpoint 4](../checkpoints/checkpoint-4/)
 
 ## Split up the code
 

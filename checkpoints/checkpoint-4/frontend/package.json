@@ -1,0 +1,31 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "express": "^4.15.4"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.5.0",
+    "sinon": "^3.2.1"
+  },
+  "scripts": {
+    "start": "babel-node server/serve.js",
+    "test": "mocha --compilers js:babel-core/register"
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "stage-0"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

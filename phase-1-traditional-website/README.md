@@ -537,7 +537,7 @@ The last part of this tutorial is a small refactoring, we create
 Please modify the tests, remove every `.html` extension from the URLs
 
 **File:** `frontend/test/highLevelTest.js`
-``` shell
+``` diff
  ...
  describe('App', function() {
    describe('/', function() {

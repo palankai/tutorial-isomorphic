@@ -7,7 +7,7 @@ We're going to create a docker compose file and the minimal folder structure.
 
 ### Create the host folder for our project
 
-Execute: on the host
+**Execute:** on the host
 ``` shell
 mkdir frontend
 ```
@@ -24,12 +24,12 @@ Create a file called `Dockerfile`.
 If you want to use shell to create a file, feel free to use the following
 command:
 
-Execute: on the host
+**Execute:** on the host
 ``` shell
 touch frontend/Dockerfile
 ```
 
-File: `frontend/Dockerfile`
+**File:** `frontend/Dockerfile`
 ``` Dockerfile
 FROM node:alpine
 
@@ -55,7 +55,7 @@ Our docker image already has [Node.js](https://nodejs.org/en/) installed.
 
 Create a docker compose file: `docker-compose.yml`
 
-File: `docker-compose.yml`
+**File:** `docker-compose.yml`
 ``` yaml
 version: "3"
 services:
@@ -75,14 +75,14 @@ volumes:
 
 ### Build our very first image
 
-Execute: on the host
+**Execute:** on the host
 ``` shell
 docker-compose build
 ```
 
 ### Start our container
 
-Execute: on the host
+**Execute:** on the host
 ``` shell
 docker-compose run --service-ports --rm tutorial-frontend ash
 ```
@@ -91,7 +91,7 @@ At this point we have an up and running node environment.
 Let's test the following commands just to understand which version of
 NodeJS we have.
 
-Execute: inside the container
+**Execute:** inside the container
 ``` shell
 node --version
 ```
@@ -101,7 +101,7 @@ Expected output
 v8.4.0
 ```
 
-Execute: inside the container
+**Execute:** inside the container
 ``` shell
 npm --version
 ```
@@ -114,7 +114,7 @@ Expected output
 If you see a version which is older than these, please pull the
 latest `alpine:node` and build your `tutorial-frontend` image again.
 
-Execute: on the host
+**Execute:** on the host
 ``` bash
 docker pull node:alpine
 ```
@@ -130,7 +130,7 @@ about our project including the dependencies.
 With the following command you can create the `package.json`. If you omit the
 `-y` flag `npm` will ask a few question about the project.
 
-Execute: inside the container
+**Execute:** inside the container
 ``` bash
 npm init -y
 ```
@@ -146,7 +146,7 @@ our static HTML files and the related resources.
 
 ### Install express js via npm
 
-Execute: inside the container
+**Execute:** inside the container
 ``` bash
 npm install --save express
 ```
@@ -159,7 +159,7 @@ Please see how the this file get changed.
 First thing to do is create a folder our publicly available files and copy
 those resources there.
 
-Execute: on the host
+**Execute:** on the host
 ``` bash
 mkdir -p frontend/public
 cp -R ../html/* frontend/public/
@@ -167,14 +167,14 @@ cp -R ../html/* frontend/public/
 
 Now we are going to create the server code.
 
-Execute: on the host
+**Execute:** on the host
 ``` bash
 mkdir -p frontend/server
 ```
 
 Create a file inside our `server` folder, called `main.js`.
 
-File: `frontend/server/main.js`
+**File:** `frontend/server/main.js`
 ``` javascript
 const express = require('express');
 const app = express();
@@ -186,7 +186,7 @@ module.exports = app;
 
 And create a file next to it, called `serve.js`.
 
-File: `frontend/server/serve.js`
+**File:** `frontend/server/serve.js`
 ``` javascript
 const app = require('./main.js');
 
@@ -197,7 +197,7 @@ app.listen(8080, function () {
 
 ### Let's do a manual test
 
-Execute: inside the container
+**Execute:** inside the container
 ``` bash
 node server/serve.js
 ```
@@ -211,7 +211,7 @@ The last missing step which come very handy later is tweak our `package.json`
 to manage the application startup. Replace the dummy test script with
 something more useful (at the moment)
 
-File: `frontend/package.json`
+**File:** `frontend/package.json`
 ``` diff
  "scripts": {
 -   "test": "echo \"Error: no test specified\" && exit 1"
@@ -221,7 +221,7 @@ File: `frontend/package.json`
 
 Repeat our manual test:
 
-Execute: inside the container
+**Execute:** inside the container
 ``` bash
 npm start
 ```
@@ -232,7 +232,7 @@ npm start
 
 Let's modify our JavaScript server code a bit.
 
-File: `frontend/server/main.js`
+**File:** `frontend/server/main.js`
 ``` diff
 -const express = require('express');
 +import express from 'express';
@@ -249,7 +249,7 @@ File: `frontend/server/main.js`
 +export default app;
 ```
 
-File: `frontend/server/serve.js`
+**File:** `frontend/server/serve.js`
 ``` diff
 -const app = require('./main.js');
 +import app from './main';
@@ -261,7 +261,7 @@ File: `frontend/server/serve.js`
 
 if we restart our server application it will fail to start.
 
-Execute: inside the container
+**Execute:** inside the container
 ``` bash
 npm start
 ```
@@ -287,7 +287,7 @@ want to import code.
 [Babel](http://babeljs.io) is a pluggable javascript transpiler.
 You could read more [about babel plugins](http://babeljs.io/docs/plugins/).
 
-Execute: inside the container
+**Execute:** inside the container
 ``` shell
 npm install --save babel-cli babel-preset-env babel-preset-stage-0
 ```
@@ -295,7 +295,7 @@ npm install --save babel-cli babel-preset-env babel-preset-stage-0
 If we change the `package.json` file again, we can use babel.
 
 
-File: `frontend/package.json`
+**File:** `frontend/package.json`
 ``` diff
  "scripts": {
 -   "start": "node server/serve.js"
@@ -306,7 +306,7 @@ File: `frontend/package.json`
 
 We will improve that configuration later.
 
-Execute: inside the container
+**Execute:** inside the container
 ``` bash
 npm start
 ```
@@ -317,7 +317,7 @@ Click on the following link: http://localhost:8080/
 
 ## Improve our Dockerfile
 
-File: `frontend/Dockerfile`
+**File:** `frontend/Dockerfile`
 ``` diff
  RUN ln -s $SRC_PATH/node_modules/ $BUILD_PATH/node_modules
 
@@ -335,7 +335,7 @@ File: `frontend/Dockerfile`
 
 Let's rebuild our image and start the container again.
 
-Execute: on the host
+**Execute:** on the host
 ``` shell
 docker-compose build
 
@@ -351,7 +351,7 @@ Click on the following link: http://localhost:8080/
 We are going to use [Mocha](https://mochajs.org/), [Chai](http://chaijs.com/)
 and [Sinon](http://sinonjs.org/).
 
-Execute: inside the container
+**Execute:** inside the container
 ``` shell
 npm install --save-dev mocha chai chai-http sinon
 ```
@@ -359,19 +359,19 @@ npm install --save-dev mocha chai chai-http sinon
 I found some bug when I started to run the real tests later. Workaround
 is simple, just install the following packages as well.
 
-Execute: inside the container
+**Execute:** inside the container
 ``` shell
 npm install --save-dev combined-stream delayed-stream
 ```
 
-Execute: on the host
+**Execute:** on the host
 ``` shell
 mkdir frontend/test
 ```
 
 Create a sanity test, create a file fronted/test/sanity.js
 
-File: `frontend/test/sanity.js`
+**File:** `frontend/test/sanity.js`
 ``` javascript
 import assert from 'assert';
 
@@ -387,7 +387,7 @@ describe('Array', function() {
 
 Finally extend our `package.json` to be able to execute the test.
 
-File: `frontend/package.json`
+**File:** `frontend/package.json`
 ``` diff
  "scripts": {
 -   "start": "babel-node server/serve.js",
@@ -396,7 +396,7 @@ File: `frontend/package.json`
  },
 ```
 
-Execute: inside the container
+**Execute:** inside the container
 ``` shell
 npm test
 ```
@@ -409,7 +409,7 @@ In this file we will write some high level assertion to make sure
 the HTML rendered well for each endpoint.
 We won't test much functionality just, some piece of expected content.
 
-File: `frontend/test/highLevelTest.js`
+**File:** `frontend/test/highLevelTest.js`
 ``` javascript
 import chai from 'chai';
 import chaiHttp from 'chai-http';
@@ -482,12 +482,12 @@ describe('App', function() {
 
 At this point we can remove out sanity test.
 
-Execute: on host
+**Execute:** on host
 ``` shell
 rm frontend/test/sanity.js
 ```
 
-Execute: inside the container
+**Execute:** inside the container
 ``` shell
 npm test
 ```
@@ -509,7 +509,7 @@ Tests should pass, and if they do you should see output like this:
 
 ### Improve our Dockerfile again, include tests in the build
 
-*File: `frontend/Dockerfile`*
+**File:** `frontend/Dockerfile`
 ``` diff
  RUN npm install
 
@@ -522,7 +522,7 @@ Tests should pass, and if they do you should see output like this:
 
 Let's rebuild our image again
 
-*Execute: on host*
+**Execute:** on host
 ``` shell
 docker-compose build
 ```
@@ -536,56 +536,127 @@ The last part of this tutorial is a small refactoring, we create
 
 Please modify the tests, remove every `.html` extension from the URLs
 
+**File:** `frontend/test/highLevelTest.js`
+``` shell
+ ...
+ describe('App', function() {
+   describe('/', function() {
+     it('responds with status 200', function(done) {
+       chai.request(app)
+         .get('/')
+         .end(function(err, res) {
+           expect(res).to.have.status(200);
+           done();
+         });
+     });
+     it('response contains expected title', function(done) {
+       chai.request(app)
+         .get('/')
+         .end(function(err, res) {
+           expect(res.text).to.have.string('ADR database');
+           done();
+         });
+     });
+   });
+   describe('/submit', function() {
+     it('responds with status 200', function(done) {
+       chai.request(app)
+-        .get('/submit.html')
++        .get('/submit')
+         .end(function(err, res) {
+           expect(res).to.have.status(200);
+           done();
+         });
+     });
+     it('response contains expected title', function(done) {
+       chai.request(app)
+-        .get('/submit.html')
++        .get('/submit')
+         .end(function(err, res) {
+           expect(res.text).to.have.string('Create new decision record');
+           done();
+         });
+     });
+   });
+   describe('/view', function() {
+     it('responds with status 200', function(done) {
+       chai.request(app)
+-        .get('/view.html')
++        .get('/view')
+         .end(function(err, res) {
+           expect(res).to.have.status(200);
+           done();
+         });
+     });
+     it('response contains expected title', function(done) {
+       chai.request(app)
+-        .get('/view.html')
++        .get('/view')
+         .end(function(err, res) {
+           expect(res.text).to.have.string('Conclusion');
+           done();
+         });
+     });
+   });
+ });
+```
+
 ### Install ejs
+
 [ejs](http://ejs.co/) which is a simple template library that we can use.
 There are many more popular template engine for express, however we don't
 need much feature. This is mainly an intermediate stage, we will barely use
 templates later.
 
+**Execute:** inside the container
 ``` shell
-# execution inside the container
 npm install --save ejs
 ```
-
 
 ### Create different endpoints
 
 Extend our `main.js` as it follows:
 
-``` javascript
-const express = require('express');
-const app = express();
+**File:** `frontend/server/main.js`
+``` diff
+ import express from 'express';
 
+ const app = express();
++
++app.get('/', function (req, res) {
++  res.send('Hello World!');
++});
++
++
++app.get('/submit', function (req, res) {
++  res.send('Hello World!');
++});
++
++
++app.get('/view', function (req, res) {
++  res.send('Hello World!');
++});
++
 
-app.get('/', function (req, res) {
-  res.send('Hello World!');
-});
+ app.use(express.static('public'));
 
-
-app.get('/submit', function (req, res) {
-  res.send('Hello World!');
-});
-
-
-app.get('/view', function (req, res) {
-  res.send('Hello World!');
-});
-
-
-app.use(express.static('public'));
-
-export default app;
+ export default app;
 ```
 
 If we test our application again, one type of error solved after removing
 the `.html` suffixes, we get `200` responses from the app.
 
+**Execute:** inside the container
+``` shell
+npm test
+```
 
 ### Introduce the templates
 
 First of all, we need to create a folder for our templates then
 move our html file to the place. We also rename them, set `.ejs` as extension.
 
+**Execute:** on the host
 ``` shell
 mkdir frontend/server/templates
 mv frontend/public/index.html frontend/server/templates/index.ejs
@@ -595,6 +666,7 @@ mv frontend/public/view.html frontend/server/templates/view.ejs
 
 The final version of our `main.js` file the following:
 
+**File:** `frontend/server/main.js`
 ``` javascript
 import path from 'path';
 
@@ -629,6 +701,10 @@ export default app;
 
 Tests should pass
 
+**Execute:** inside the container
+``` shell
+npm test
+```
 
 ### Fix links in the html files
 
@@ -636,6 +712,32 @@ The last piece to fix is replacing the links, referring pages without `.html`
 suffix. I'm not going to show that, however you will find them as a base
 in the folder of the next chapter.
 
+Edit the following three files:
+- `frontend/server/templates/index.ejs`
+- `frontend/server/templates/submit.ejs`
+- `frontend/server/templates/view.ejs`
+
+Replace every :
+- `index.html` to `/`
+- `submit.html` to `/submit`
+- `view.html` to `/view`
+
+
+Be careful with the links like this:
+
+``` diff
+-<li><a href="index.html?byDate=2017-03">March 2017</a></li>
++<li><a href="/?byDate=2017-03">March 2017</a></li>
+```
+
+**Execute:** inside the container
+``` shell
+npm start
+```
+
+Click on the following link: http://localhost:8080/
+
+[Checkpoint 5](../checkpoints/checkpoint-5/)
 
 ## lint
 

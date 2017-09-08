@@ -509,7 +509,7 @@ Tests should pass, and if they do you should see output like this:
 
 ### Improve our Dockerfile again, include tests in the build
 
-File: `frontend/Dockerfile`
+*File: `frontend/Dockerfile`*
 ``` diff
  RUN npm install
 
@@ -522,7 +522,7 @@ File: `frontend/Dockerfile`
 
 Let's rebuild our image again
 
-Execute: on host
+*Execute: on host*
 ``` shell
 docker-compose build
 ```

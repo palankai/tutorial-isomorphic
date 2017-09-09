@@ -12,7 +12,7 @@ First we recreate the main page components and through multiple steps we
 are going to create many small components to have server rendered
 React web application.
 
-We will start from [Checkpoint 6](../checkpoints/checkpoint-6/).
+We will start from [Checkpoint 6](../checkpoints/checkpoint-06/).
 
 ## Recap
 
@@ -250,51 +250,153 @@ npm run lint
 
 I believe, you don't see any errors now.
 
-[Checkpoint 7](../checkpoints/checkpoint-7/)
+[Checkpoint 7](../checkpoints/checkpoint-07/)
 
+## Convert the whole pages into a React Component
 
-## Convert the whole index page into a React Component
+### The index page
 
 Let's grab the body content of the `index.ejs` and move it to the
 content of our component.
 
-``` jsx
-import React from 'react';
-
-const Index = () => (
-  <div>
--    <p>Hello World</p>
-+     <nav className="navbar navbar-inverse navbar-static-top">
-+       <div className="container">
-+ ...
-+         </aside>
-+       </div>
-+     </div>
-  </div>
-);
-
-export default Index;
-```
-
-However there is a syntax issue, the world `class` is reserved and `JSX`
-is a mixed Javascript and HTML dialect. We have to replace all of the `class`
-world to `className`.
-
-Apart from that one small modification is necessary:
-
+**File:** `frontend/server/templates/index.ejs`
 ``` diff
-    <div className="input-group">
--     <input type="text" name="byText" className="form-control" placeholder="Search...">
-+     <input type="text" name="byText" className="form-control" placeholder="Search..." />
-    <span className="input-group-btn">
+ <body>
+-   <nav className="navbar navbar-inverse navbar-static-top">
+-     <div className="container">
+-  ...
+-      </aside>
+-    </div>
+-  </div>
+ </body>
 ```
 
-If you start restart our application again, you will see that's correctly
-rendered.
+**File:** `frontend/client/containers/Index/index.jsx`
+``` diff
+ import React from 'react';
+
+ const Index = () => (
+   <div>
+-     <p>Hello World</p>
++      <nav className="navbar navbar-inverse navbar-static-top">
++        <div className="container">
++  ...
++          </aside>
++        </div>
++      </div>
+   </div>
+ );
+
+ export default Index;
+```
+We've also removed the Hello World line from the component.
+Let's restart our application, see whether it starts.
+
+**Execute:** inside the container
+``` shell
+npm run lint
+```
+
+No, it doesn't. I have to admit, it didn't surprise me. Not just because
+I wrote the future chapters and see what's coming, but also it's very-very
+common we make mistakes in our code and it doesn't want start anymore.
+
+The output will be very similar on your screen.
+```
+> frontend@1.0.0 start /usr/src/frontend
+> babel-node server/serve.js
+
+/usr/src/frontend/node_modules/babel-core/lib/transformation/file/index.js:590
+      throw err;
+      ^
+
+SyntaxError: /usr/src/frontend/client/containers/Index/index.jsx: Expected corresponding JSX closing tag for <input> (29:12)
+  27 |               </button>
+  28 |             </span>
+> 29 |             </div>
+     |             ^
+  30 |           </form>
+  31 |         </div><!--/.nav-collapse -->
+  32 |       </div>
+```
+I encourage you to try to understand the errors, fix them without read
+any further. But then please compare your solution with mine.
+
+#### Fixing the `<input>` error
+
+JSX demands you to close every tags, although tags can be self closing.
+
+**File:** `frontend/client/containers/Index/index.jsx`
+``` diff
+ <div className="input-group">
+-  <input type="text" name="byText" className="form-control" placeholder="Search...">
++  <input type="text" name="byText" className="form-control" placeholder="Search..." />
+ <span className="input-group-btn">
+```
+
+#### Remove comments
+
+The JSX is more JavaScript than HTML. The HTML comments doesn't work.
+
+**File:** `frontend/client/containers/Index/index.jsx`
+``` diff
+     </form>
+-  </div><!--/.nav-collapse -->
++  </div>
+ </div>
+```
+
+#### Remove ejs code
+
+We copied some part of the template which isn't suppose to be here.
+First remove it from the component
+
+**File:** `frontend/client/containers/Index/index.jsx`
+``` diff
+ </article>
+-
+-<div id="Application"><%- Application %></div>
+
+ <footer>
+```
+
+**File:** `frontend/server/templates/index.ejs`
+``` diff
+ <body>
++  <div id="Application"><%- Application %></div>
+ <body>
+```
+
+#### Fix class names
+
+**Execute:** inside the container
+``` shell
+npm start
+```
+Click on the following link: http://localhost:8080/
+
+You will see the application is there, but looks a bit weird.
+The issue with it is that doesn't recognise the CSS classes anymore.
+
+The word `class` is a keyword in `JSX` as it is a mixed JavaScript
+and HTML dialect. We have to replace all occurrences of the
+`class` word to `className`.
+
+If you are vim user: `%s/class/className/g`.
+
+See the page again
+
+**Execute:** inside the container
+``` shell
+npm start
+```
+Click on the following link: http://localhost:8080/
+
+[Checkpoint 8](../checkpoints/checkpoint-08/)
 
 There are many eslint issues, but let's not worry about that for a bit.
 
-### Convert the view and submit page as well into a React components.
+### Convert the view and submit pages as well into a React components
 
 There is not much detail that I can show at this point, I assume
 you will be able reiterate the previous steps.
@@ -306,17 +408,133 @@ List of things that you have to do:
 - Replace `for` to `htmlFor`
 - Close each HTML tag
 - Get rid of comments
+- Put the `<div id="Application"><%- Application %></div>` piece to the ejs code
+- Modify `frontend/server/main.jsx` to render the components.
 
 **An important note: every React component has to have exactly one top
 level component!**
 
 For now, keep the tree template files, we will merge them soon.
-
 We will continue the work, based on the assumption those components are
 created.
 
+If you are unsure any of the step, please read again what we did with
+the index page. Also, again, I encourage you to start the application
+again and again, see what the errors say.
+If you decide to give up this point, you may want to check the next
+checkpoint code.
+
 You should finally execute the tests, which should pass.
 
+**Execute:** inside the container
+``` shell
+npm test
+```
+
+**Execute:** inside the container
+``` shell
+npm start
+```
+Click on the following link: http://localhost:8080/
+
+After this refactor your folder structure should look like this:
+
+```
+.
+├── docker-compose.yml
+└── frontend
+    ├── Dockerfile
+    ├── client
+    │   └── containers
+    │       ├── Index
+    │       │   └── index.jsx
+    │       ├── Submit
+    │       │   └── index.jsx
+    │       └── View
+    │           └── index.jsx
+    ├── node_modules
+    ├── package-lock.json
+    ├── package.json
+    ├── public
+    │   └── static
+    │       ├── css
+    │       │   ├── bootstrap-theme.min.css
+    │       │   ├── bootstrap-theme.min.css.map
+    │       │   ├── bootstrap.cosmo.min.css
+    │       │   ├── bootstrap.min.css
+    │       │   ├── bootstrap.min.css.map
+    │       │   ├── bootstrap.spacelab.min.css
+    │       │   └── styles.css
+    │       └── fonts
+    │           ├── glyphicons-halflings-regular.eot
+    │           ├── glyphicons-halflings-regular.svg
+    │           ├── glyphicons-halflings-regular.ttf
+    │           ├── glyphicons-halflings-regular.woff
+    │           └── glyphicons-halflings-regular.woff2
+    ├── server
+    │   ├── main.jsx
+    │   ├── serve.js
+    │   └── templates
+    │       ├── index.ejs
+    │       ├── submit.ejs
+    │       └── view.ejs
+    └── test
+        └── highLevelTest.js
+```
+
+[Checkpoint 9](../checkpoints/checkpoint-09/)
+
+## Babel import issue
+
+In the next section we are going to create many small components. When
+we use them, we have to import them. The relative import in some cases
+a good thing, but if I see imports like `../../components/Navigation`, that
+a bad smell. I prefer import components relatively down from the code, like
+nested packages, but using relative import to import a very different part
+of the code, never a good idea.
+
+I prefer the import like this (example):
+``` diff
+-import Navigation from '../../components/Navigation';
++import Navigation from 'components/Navigation';
+```
+
+In order to do that we have to install a babel plugin called
+[Module Resolver](https://github.com/tleunen/babel-plugin-module-resolver),
+this will help us to maintain our packages easier.
+
+(This issue can be solved with many other ways too)
+
+**Execute:** inside the container
+``` shell
+npm install --save babel-plugin-module-resolver
+```
+
+Modify our `package.json` to use this plugin.
+
+**File:** `frontend/package.json`
+``` diff
+ "babel": {
+   "presets": [
+     "react",
+     "env",
+     "stage-0"
+-    ]
++    ],
++    "plugins": [
++      ["module-resolver", {
++        "root": ["./"],
++        "alias": {
++          "components": "./client/components",
++          "containers": "./client/containers"
++        }
++      }]
++    ]
+ },
+```
+Right now it doesn't make any difference.
+
+[Checkpoint 10](../checkpoints/checkpoint-10/)
 
 ## Extract components
 

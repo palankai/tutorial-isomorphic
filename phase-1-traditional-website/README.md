@@ -226,7 +226,7 @@ Repeat our manual test:
 npm start
 ```
 
-[Checkpoint 1](../checkpoints/checkpoint-1/)
+[Checkpoint 1](../checkpoints/checkpoint-01/)
 
 ## Use latest JavaScript features
 
@@ -313,7 +313,7 @@ npm start
 
 Click on the following link: http://localhost:8080/
 
-[Checkpoint 2](../checkpoints/checkpoint-2/)
+[Checkpoint 2](../checkpoints/checkpoint-02/)
 
 ## Improve our Dockerfile
 
@@ -344,7 +344,7 @@ docker-compose run --service-ports --rm tutorial-frontend
 
 Click on the following link: http://localhost:8080/
 
-[Checkpoint 3](../checkpoints/checkpoint-3/)
+[Checkpoint 3](../checkpoints/checkpoint-03/)
 
 ## Create a test to check whether our HTML generated well
 
@@ -527,7 +527,7 @@ Let's rebuild our image again
 docker-compose build
 ```
 
-[Checkpoint 4](../checkpoints/checkpoint-4/)
+[Checkpoint 4](../checkpoints/checkpoint-04/)
 
 ## Split up the code
 
@@ -737,7 +737,7 @@ npm start
 
 Click on the following link: http://localhost:8080/
 
-[Checkpoint 5](../checkpoints/checkpoint-5/)
+[Checkpoint 5](../checkpoints/checkpoint-05/)
 
 ## lint
 
@@ -893,5 +893,5 @@ and I strongly advise to execute it on the CI server.
 
 Well done. If you've reached this point, you have a solid base code.
 
-[Checkpoint 6](../checkpoints/checkpoint-6/)
+[Checkpoint 6](../checkpoints/checkpoint-06/)
 

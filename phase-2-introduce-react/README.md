@@ -1,18 +1,18 @@
 # Phase 2 - Introduce react
 
-In this tutorial we will introduce React, and convert our application
-to a modern universal website.
+In this tutorial we will introduce React.
 
-This code is crying for a serious refactoring.
-We have 3 very redundant templates.
-If we want to fill our app with real content, we have to break down the
-template files, create much smaller fragments. We have to create reusable
+This code is crying for a serious refactoring. We have 3 very redundant
+templates. If we want to fill our app with real content, we have to break
+template files down, create much smaller fragments. We have to create reusable
 components. Although with ejs we can easily achieve that, we will use
 [React](https://facebook.github.io/react/).
 
 First we recreate the main page components and through multiple steps we
 are going to create many small components to have server rendered
 React web application.
+
+We will start from [Checkpoint 6](../checkpoints/checkpoint-6/).
 
 ## Recap
 
@@ -25,39 +25,32 @@ Guideline check is done by [ESLint](https://eslint.org/) with
 [Airbnb ESLint configuration](https://www.npmjs.com/package/eslint-config-airbnb).
 
 
-Build the docker image
+**Execute:** on the host
 ``` shell
-# execute on the host
 docker-compose build
 ```
 
-Start container, http://localhost:8080/
+**Execute:** on the host
 ``` shell
-# execute on the host
-docker-compose run --service-ports --rm tutorial-frontend
-```
-
-Enter to the container, to be able to execute commands in it
-``` shell
-# execute on the host
 docker-compose run --service-ports --rm tutorial-frontend ash
 ```
 
-Start the application
+Start the application and then http://localhost:8080/
+
+**Execute:** inside the container
 ``` shell
-# execute inside the container
 npm run start
 ```
 
 Execute tests
+**Execute:** inside the container
 ``` shell
-# execute inside the container
 npm run test
 ```
 
 Check coding guidelines
+**Execute:** inside the container
 ``` shell
-# execute inside the container
 npm run lint
 ```
 
@@ -67,12 +60,10 @@ Instead of explaining how to use React, I think the best is to get our hands
 dirty. You may want to read (at least briefly) the
 [React tutorial](https://facebook.github.io/react/docs/hello-world.html).
 
+**Execute:** inside the container
 ``` shell
-# execute inside the container
 npm install --save react react-dom
 ```
-
-### Convert our templates to React Component
 
 Create a folder for our components. We can differentiate two kind of
 components using react, one of them often referred as Components and
@@ -92,8 +83,8 @@ doesn't prove that.
 
 Let's create a folder for our Containers.
 
+**Execute:** on the host
 ``` shell
-# execute on the host
 mkdir -p frontend/client/containers
 ```
 
@@ -101,7 +92,7 @@ There are multiple ways to organise React components, I prefer to have
 folder for each Components and an `index.jsx` files in that folder.
 It's arguable, you can do differently.
 
-## Create a react component
+### Create a react component
 
 In this section we are going to create a very simply hello word component,
 and we are going to render it to our index page just to demonstrate the power
@@ -109,13 +100,14 @@ of React.
 
 Create folder for our component.
 
+**Execute:** on the host
 ``` shell
-# execute on the host
 mkdir -p frontend/client/containers/Index
 ```
 
-Create an `Index.jsx` file in it with the following content:
+Create an `index.jsx` file in it with the following content:
 
+**File:** `frontend/client/containers/Index/index.jsx`
 ``` jsx
 import React from 'react';
 
@@ -134,95 +126,115 @@ To be able to use this component, we have to do several small modifications.
 
 One of the first thing that I recommend, is modify our linter configuration:
 
+
+**File:** `frontend/package.json`
 ``` diff
-  "scripts": {
-    "start": "babel-node server/serve.js",
-    "test": "mocha --compilers js:babel-core/register",
--     "lint": "eslint . --ext .js",
--     "lint:fix": "eslint . --ext .js --fix"
-+     "lint": "eslint . --ext .js,.jsx",
-+     "lint:fix": "eslint . --ext .js,.jsx --fix"
-  },
-  "eslintConfig": {
-    "parser": "babel-eslint",
-    "rules": {},
-    "env": {
-      "mocha": true
-    },
-    "extends": [
--       "airbnb-base"
-+       "airbnb"
-    ]
-  },
+ "scripts": {
+   "start": "babel-node server/serve.js",
+   "test": "mocha --compilers js:babel-core/register",
+-  "lint": "eslint . --ext .js",
+-  "lint:fix": "eslint . --ext .js --fix"
++  "lint": "eslint . --ext .js,.jsx",
++  "lint:fix": "eslint . --ext .js,.jsx --fix"
+ },
+ "eslintConfig": {
+   "parser": "babel-eslint",
+   "rules": {},
+   "env": {
+     "mocha": true
+   },
+   "extends": [
+-    "airbnb-base"
++    "airbnb"
+   ]
+ },
 ```
 
 ### Upgrade babel configuration
 
 Install [Babel React preset](https://babeljs.io/docs/plugins/preset-react/)
 
+**Execute:** inside the container
 ``` shell
-# execute inside the container
 npm install --save babel-preset-react
 ```
 
 Modify babel configuration in `package.json`:
 
+**File:** `frontend/package.json`
 ``` diff
-  "babel": {
-    "presets": [
-+       "react",
-      "env",
-      "stage-0"
-    ]
-  },
+ "babel": {
+   "presets": [
++    "react",
+     "env",
+     "stage-0"
+   ]
+ },
 ```
 
 ### Render our first component
 
 Open and modify our `index.ejs` as it follows:
 
+**File:** `frontend/server/templates/index.ejs`
 ``` diff
-            <footer>
-              <a href="/view">Read more</a>
-            </footer>
-          </article>
+   ...
+   <footer>
+     <a href="/view">Read more</a>
+   </footer>
+ </article>
 +
-+           <div id="Application"><%- Application %></div>
++<div id="Application"><%- Application %></div>
 
-          <footer>
-            <nav aria-label="Page navigation">
+ <footer>
+   <nav aria-label="Page navigation">
+   ...
 ```
 
 Modify our `main.js` which generates the content for the index page.
 
 First, import the necessary packages.
-``` diff
-import path from 'path';
 
-+ import React from 'react';
-+ import { renderToString } from 'react-dom/server';
-import express from 'express';
+**File:** `frontend/server/main.js`
+``` diff
+ import path from 'path';
+
++import React from 'react';
++import { renderToString } from 'react-dom/server';
+ import express from 'express';
 
 +
-+ import Index from '../client/containers/Index';
++import Index from '../client/containers/Index';
 
-const app = express();
+ const app = express();
 ```
 
 Then make the React component rendered.
 
+**File:** `frontend/server/main.js`
 ``` diff
-app.get('/', (req, res) => {
--   res.render('index');
-+   res.render('index', {
-+     Application: renderToString(<Index />),
-+   });
-});
+ app.get('/', (req, res) => {
+-  res.render('index');
++  res.render('index', {
++    Application: renderToString(<Index />),
++  });
+ });
 ```
 
 So far we have a very simple component, that we can render into HTML.
 
-Don't forget to execute the `npm run lint`!
+**Execute:** inside the container
+``` shell
+npm start
+```
+Click on the following link: http://localhost:8080/
+
+Let's check how this code aligned with our guidelines.
+
+**Execute:** inside the container
+``` shell
+npm run lint
+```
 
 We can simply fix that error, renaming the `main.js` to `main.jsx`
 
@@ -230,6 +242,16 @@ We can simply fix that error, renaming the `main.js` to `main.jsx`
 # execute on the host
 mv frontend/server/main.js frontend/server/main.jsx
 ```
+
+**Execute:** inside the container
+``` shell
+npm run lint
+```
+
+I believe, you don't see any errors now.
+
+[Checkpoint 7](../checkpoints/checkpoint-7/)
+
 
 ## Convert the whole index page into a React Component
 

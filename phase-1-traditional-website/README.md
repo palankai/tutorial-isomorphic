@@ -741,68 +741,75 @@ Click on the following link: http://localhost:8080/
 
 ## lint
 
-The general purpose of check the code with [eslint](https://eslint.org/)
+The general purpose of check our work with [eslint](https://eslint.org/)
 is finding problematic code. Those issues may not cause problems directly,
 but could cause headaches later, better to avoid them.
-
-Let's install a few more packages:
-
-``` bash
-# execute inside the container
-npm install --save-dev eslint babel-eslint
-```
 
 Since we don't want to specify our own guidelines, we can choose
 an open source set of rules.
 The [Airbnb Style Guide](https://github.com/airbnb/javascript)
 is a very popular choice. Let's install that
-(ESLint configuration)[https://www.npmjs.com/package/eslint-config-airbnb].
+[ESLint configuration](https://www.npmjs.com/package/eslint-config-airbnb).
 
-``` bash
-# execute inside the container
+**Execute:** inside the container
+``` shell
 (
   export PKG=eslint-config-airbnb;
   npm info "$PKG@latest" peerDependencies --json | command sed 's/[\{\},]//g ; s/: /@/g' | xargs npm install --save-dev "$PKG@latest"
 )
 ```
+
+We should install an extra plugin for
+[babel-eslint](https://www.npmjs.com/package/babel-eslint) which comes
+handy soon, in the next chapter, when we refactor our code and modify
+the way of importing packages.
+
+**Execute:** inside the container
+``` shell
+npm install --save-dev babel-eslint
+```
+
 This command may looks very ugly but it makes sure you install all of the needed
 plugins as well.
 
 Let's extend our `package.json`:
 
+**File:** `frontend/package.json`
 ``` diff
-  "scripts": {
-    "start": "babel-node server/serve.js",
--     "test": "mocha --compilers js:babel-core/register"
-+     "test": "mocha --compilers js:babel-core/register",
-+     "lint": "eslint . --ext .js",
-+     "lint:fix": "eslint . --ext .js --fix"
-  },
-+   "eslintConfig": {
-+     "parser": "babel-eslint",
-+     "rules": {},
-+     "extends": [
-+       "airbnb-base"
-+     ]
-+   },
-  "babel": {
-    "presets": [
+ "scripts": {
+   "start": "babel-node server/serve.js",
+-    "test": "mocha --compilers js:babel-core/register"
++    "test": "mocha --compilers js:babel-core/register",
++    "lint": "eslint . --ext .js",
++    "lint:fix": "eslint . --ext .js --fix"
+ },
++"eslintConfig": {
++  "parser": "babel-eslint",
++  "rules": {},
++  "extends": [
++    "airbnb-base"
++  ]
++},
+ "babel": {
+   "presets": [
 ```
 
-If you execute the linter, it will find many errors.
+**Execute:** inside the container
 ``` bash
-# execute inside the container
 npm run lint
 ```
 
-We can fix some of them in the following way:
+The really good thing with eslint (I guess it is similar with the other
+linter tools), it has a way to fix small error. Error, which does not
+modify the behaviour of the application, like indentation.
 
+**Execute:** inside the container
 ``` bash
-# execute inside the container
 npm run lint:fix
 ```
 
-I guess some of the failure like the following.
+I believe most of the error gone by now. Although, there are some error
+which cannot be fixed automatically.
 
 ```
 /usr/src/frontend/test/highLevelTest.js
@@ -812,24 +819,31 @@ I guess some of the failure like the following.
   22:5  error  'it' is not defined        no-undef
 ```
 
-However those statement are true, the code actually works fine, that's
+However those statements are true, the code actually works fine, that's
 a false alarm. We can fix it, modify the linter configuration:
+This modification tells to the linter, we use a package which define
+those global function, so it doesn't have to care about it anymore.
 
+**File:** `frontend/package.json`
 ``` diff
-  "eslintConfig": {
-    "parser": "babel-eslint",
-    "rules": {},
-+     "env": {
-+       "mocha": true
-+     },
-    "extends": [
-      "airbnb-base"
-    ]
-  },
+ "eslintConfig": {
+   "parser": "babel-eslint",
+   "rules": {},
++  "env": {
++    "mocha": true
++  },
+   "extends": [
+     "airbnb-base"
+   ]
+ },
 ```
 
-I think only one error remains. (If not, please fix the rest manually).
+**Execute:** inside the container
+``` bash
+npm run lint
+```
 
+I believe only one error remains. (If not, please fix the rest manually).
 ```
 /usr/src/frontend/server/serve.js
   4:3  warning  Unexpected console statement  no-console
@@ -843,26 +857,41 @@ although we actually want to use that.
 We can simply disable that error, putting a comment in the code:
 
 
+**File:** `frontend/server/serve.js`
 ``` diff
-app.listen(8080, () => {
-+   // eslint-disable-next-line no-console
-  console.log('Example app listening on port 8080!');
-});
+ app.listen(8080, () => {
++  // eslint-disable-next-line no-console
+   console.log('Example app listening on port 8080!');
+ });
+```
+
+**Execute:** inside the container
+``` bash
+npm run lint
+```
+
+If you see the following output, that means you've fixed all of the issues.
+```
+/usr/src/frontend # npm run lint
+npm info it worked if it ends with ok
+npm info using npm@5.3.0
+npm info using node@v8.4.0
+npm info lifecycle frontend@1.0.0~prelint: frontend@1.0.0
+npm info lifecycle frontend@1.0.0~lint: frontend@1.0.0
+
+> frontend@1.0.0 lint /usr/src/frontend
+> eslint . --ext .js
+
+npm info lifecycle frontend@1.0.0~postlint: frontend@1.0.0
+npm info ok
+/usr/src/frontend #
 ```
 
 You may want to add the linter to your `Dockerfile`, but I found it very
 annoying. I recommend to execute that regularly, especially before commits
 and I strongly advise to execute it on the CI server.
 
-## Finally
-
 Well done. If you've reached this point, you have a solid base code.
 
-Remainder, you can start that with the following command:
+[Checkpoint 6](../checkpoints/checkpoint-6/)
 
-``` shell
-# execute on the host
-docker-compose run --service-ports --rm tutorial-frontend
-```
-
-You can check the [final code of this chapter](../phase-2-introduce-react/)

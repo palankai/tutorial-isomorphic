@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
+    "babel-watch": "^2.0.7",
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
     "eslint": "^4.6.1",
@@ -28,6 +29,7 @@
   },
   "scripts": {
     "start": "babel-node server/serve.js",
+    "watch": "babel-watch server/serve.js",
     "test": "mocha --compilers js:babel-core/register",
     "lint": "eslint . --ext .js,.jsx",
     "lint:fix": "eslint . --ext .js,.jsx --fix"
@@ -49,13 +51,18 @@
       "stage-0"
     ],
     "plugins": [
-      ["module-resolver", {
-        "root": ["./"],
-        "alias": {
-          "components": "./client/components",
-          "containers": "./client/containers"
+      [
+        "module-resolver",
+        {
+          "root": [
+            "./"
+          ],
+          "alias": {
+            "components": "./client/components",
+            "containers": "./client/containers"
+          }
         }
-      }]
+      ]
     ]
   },
   "keywords": [],

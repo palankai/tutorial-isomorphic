@@ -484,7 +484,9 @@ After this refactor your folder structure should look like this:
 
 [Checkpoint 9](../checkpoints/checkpoint-09/)
 
-## Babel import issue
+## Speed up the development
+
+### Babel import issue
 
 In the next section we are going to create many small components. When
 we use them, we have to import them. The relative import in some cases
@@ -534,74 +536,64 @@ Modify our `package.json` to use this plugin.
 ```
 Right now it doesn't make any difference.
 
+### Automatic reload
+
+The other issue, that may have realised, we have to restart our server
+every time if we modify any code. That's normal, since the application
+has to be rerendered. But we can make it easier if we install
+[babel-watch](https://github.com/kmagiera/babel-watch) plugin.
+
+**Execute:** inside the container
+``` shell
+npm install --save-dev babel-watch
+```
+
+**File:** `frontend/package.json`
+``` diff
+ "scripts": {
+   "start": "babel-node server/serve.js",
++  "watch": "babel-watch server/serve.js",
+   "test": "mocha --compilers js:babel-core/register",
+   "lint": "eslint . --ext .js,.jsx",
+   "lint:fix": "eslint . --ext .js,.jsx --fix"
+ },
+```
+
+**Execute:** inside the container
+``` shell
+npm run watch
+```
+
+If we modify anything and save(!) we should see the following on the terminal:
+
+```
+/usr/src/frontend # npm run watch
+npm info it worked if it ends with ok
+npm info using npm@5.3.0
+npm info using node@v8.4.0
+npm info lifecycle frontend@1.0.0~prewatch: frontend@1.0.0
+npm info lifecycle frontend@1.0.0~watch: frontend@1.0.0
+
+> frontend@1.0.0 watch /usr/src/frontend
+> babel-watch server/serve.js
+
+Example app listening on port 8080!
+>>> RESTARTING <<<
+Example app listening on port 8080!
+```
+
+That indicates, babel-watch recognised the changes.
+
+From now on, feel free to use this, instead of `npm start`.
+
 [Checkpoint 10](../checkpoints/checkpoint-10/)
+
 
 ## Extract components
 
 In this section we're going to extract components, break down our three pages.
 
-### Solve import with babel
-
-We are going to create small components, and we will use them inside each
-other. In many cases the relative import works best but it could make
-the refactoring very difficult as well.
-
-In the following sections we will create components like `Navigation`
-and we have to import them. The header of our container components would
-look like this:
-
-``` diff
-import React from 'react';
-+ import Navigation from '../../components/Navigation';
-```
-
-If you look closer, you will see, we have to navigate 2 folders up first.
-However we are build a container component directly inside the container
-folder. It still make sense, since we've decided to use folder based
-components (folder, and an index.jsx inside - I made up this name).
-But it's implementation details, makes any refactoring harder.
-
-I prefer the import like this:
-
-``` diff
-import React from 'react';
-- import Navigation from '../../components/Navigation';
-+ import Navigation from 'components/Navigation';
-```
-
-In order to do that we have to install a babel plugin called
-[Module Resolver](https://github.com/tleunen/babel-plugin-module-resolver),
-this will help us to maintain our packages easier.
-
-(This issue can be solved with many other ways)
-
-``` shell
-# execute inside the container
-npm install --save babel-plugin-module-resolver
-```
-
-Modify our `package.json` to use this plugin.
-``` diff
-  "babel": {
-    "presets": [
-      "react",
-      "env",
-      "stage-0"
--     ]
-+     ],
-+     "plugins": [
-+       ["module-resolver", {
-+         "root": ["./"],
-+         "alias": {
-+           "components": "./client/components",
-+           "containers": "./client/containers"
-+         }
-+       }]
-+     ]
-  },
-```
-
-### Extract navigation
+### Extract the top navigation
 
 ``` shell
 # execute on the host
